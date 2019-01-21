@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="IPIP即网际协议，作用是实现终端节点之间的通信，属于网络层。数据链路层的作用是在互连同一种数据链路的节点之间进行包传递，要跨越多种数据链路，需要借助网络层。网络层可以跨越不同的数据链路实现两端节点的数据包传输。 IP大致有三大作用模块，IP寻址，路由，以及IP分包与组包。 Hop译为跳，是主机或路由器网卡不经其他路由器而能直接到达的相邻主机或路由器网卡之间的一个区间，IP包正是在网络中一个跳间被">
+<meta property="og:type" content="article">
+<meta property="og:title" content="图解TCP&#x2F;IP读书笔记">
+<meta property="og:url" content="http://goalong.github.io/2018/09/07/图解TCP:IP/index.html">
+<meta property="og:site_name" content="along&#39;s space">
+<meta property="og:description" content="IPIP即网际协议，作用是实现终端节点之间的通信，属于网络层。数据链路层的作用是在互连同一种数据链路的节点之间进行包传递，要跨越多种数据链路，需要借助网络层。网络层可以跨越不同的数据链路实现两端节点的数据包传输。 IP大致有三大作用模块，IP寻址，路由，以及IP分包与组包。 Hop译为跳，是主机或路由器网卡不经其他路由器而能直接到达的相邻主机或路由器网卡之间的一个区间，IP包正是在网络中一个跳间被">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://i.loli.net/2018/08/11/5b6eae9ce82fe.png">
+<meta property="og:image" content="https://i.loli.net/2018/08/11/5b6eafcc8a43f.png">
+<meta property="og:image" content="https://i.loli.net/2018/08/11/5b6eb2132d29f.png">
+<meta property="og:image" content="https://i.loli.net/2018/08/11/5b6eb4cbc28d1.png">
+<meta property="og:image" content="https://i.loli.net/2018/08/12/5b6ff3b69059e.png">
+<meta property="og:updated_time" content="2019-01-21T08:44:46.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="图解TCP&#x2F;IP读书笔记">
+<meta name="twitter:description" content="IPIP即网际协议，作用是实现终端节点之间的通信，属于网络层。数据链路层的作用是在互连同一种数据链路的节点之间进行包传递，要跨越多种数据链路，需要借助网络层。网络层可以跨越不同的数据链路实现两端节点的数据包传输。 IP大致有三大作用模块，IP寻址，路由，以及IP分包与组包。 Hop译为跳，是主机或路由器网卡不经其他路由器而能直接到达的相邻主机或路由器网卡之间的一个区间，IP包正是在网络中一个跳间被">
+<meta name="twitter:image" content="https://i.loli.net/2018/08/11/5b6eae9ce82fe.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://goalong.github.io/2018/09/07/图解TCP:IP/">
+
+
+
+
+
+  <title>图解TCP/IP读书笔记 | along's space</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">along's space</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://goalong.github.io/2018/09/07/图解TCP:IP/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="along">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="along's space">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">图解TCP/IP读书笔记</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-09-07T00:00:00+08:00">
+                2018-09-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="IP"><a href="#IP" class="headerlink" title="IP"></a>IP</h3><p>IP即网际协议，作用是实现终端节点之间的通信，属于网络层。<br>数据链路层的作用是在互连同一种数据链路的节点之间进行包传递，要跨越多种数据链路，需要借助网络层。网络层可以跨越不同的数据链路实现两端节点的数据包传输。</p>
+<p>IP大致有三大作用模块，IP寻址，路由，以及IP分包与组包。</p>
+<p>Hop译为跳，是主机或路由器网卡不经其他路由器而能直接到达的相邻主机或路由器网卡之间的一个区间，IP包正是在网络中一个跳间被转发。</p>
+<p>所有主机都维护者一张路由控制表，该表记录IP数据在下一步应该发给哪个路由器，IP包将根据这个路由表在各个数据链路上传输</p>
+<p>IP是实现多个数据链路之间通信的协议，不同的数据链路的地址都可以被抽象为IP地址，数据链路的区别在于各自的最大传输单位（MTU）不同</p>
+<p>IP进行分片处理，将较大的IP包分成多个较小的IP包，来解决不同链路MTU不同的问题。</p>
+<p>IP属于面向无连接型，即在发包之前，不需要建立与对端目标地址之间的连接。面向连接的情况，则需要事先建立连接，如果对端主机关机或不存在，则不能建立连接。面向无连接则不同，即使对端主机关机或不存在，数据包还是会被发送出去。IP采用面向无连接主要为了简化和提速。</p>
+<p>路径MTU发现，即寻找发送端主机到接收端主机路径中所有的数据链路的最小的MTU。</p>
+<p>路径MTU发现的工作原理：发送端主机发送IP数据报时将首部的分片禁止标志位设置为1，这样途中的路由器及时遇到分片才能处理的大包，也不会分片，而是将包丢弃，然后通过一个ICMP的不可达消息将该MTU发给发送主机，下一次，发送主机将上面收到的MTU设为当前MTU，然后继续发送给目标主机，知道数据包被发送到目标主机为止，最后一次ICMP通知的MTU即为路径上最小的MTU。</p>
+<p>IPv4首部：版本，首部长度，区分服务，总长度，标识， 标志，片偏移，生存时间，协议，首部校验和，源地址，目标地址，可选字段，填充</p>
+<h3 id="TCP"><a href="#TCP" class="headerlink" title="TCP"></a>TCP</h3><p>TCP用于在传输层有必要实现可靠传输的情况，UDP用于对高速传输和实时性有较高要求的通信或广播通信。</p>
+<p>TCP和UDP中通常用源IP地址，目标IP地址，协议，源端口号，目标端口号这五个信息来识别一个通信。</p>
+<p>TCP充分实现了数据传输时的各种控制功能，可以进行丢包时的重发控制，对次序乱掉的分包进行重组等，作为面向有连接的协议，只在确认通信对端存在时才会发送数据。</p>
+<p>为了通过IP数据报实现可靠性传输，需要解决数据的破坏，丢包，重复，以及分片顺序混乱等问题，TCP通过校验和，序列号，确认应答，重发控制，连接管理以及窗口控制等机制实现可靠性传输。</p>
+<h4 id="序列号和确认应答"><a href="#序列号和确认应答" class="headerlink" title="序列号和确认应答"></a>序列号和确认应答</h4><p>在TCP中，当发送端的数据到达接收主机时，接收端主机会返回一个已收到消息的通知，这个消息叫确认应答（ACK）。</p>
+<p>发送端发出数据后等待对端的确认应答，如果有确认应答，表明数据已到达，一定时间内没有等到确认应答，则认为丢失，并进行重发，由此即使发生丢包，仍能保证数据到达对端，实现可靠传输。</p>
+<p>未收到确认应答也不一定意味着数据丢失，也可能是已经收到，返回的确认应答在途中丢失或延迟到达，此时发送端会重发数据。接收端会反复收到相同的数据，必须放弃重复的数据包，因此需要一种机制，能识别是否已经接收数据，以及判断是否需要接收，TCP中通过序列号来实现。接收端通过接收数据TCP首部的序列号和数据的长度，将下一步应该接受的序号作为确认应答返送回去，通过序列号和确认应答号，TCP可以实现可靠传输。</p>
+<h4 id="重发超时的确定"><a href="#重发超时的确定" class="headerlink" title="重发超时的确定"></a>重发超时的确定</h4><p>在每次发包时会计算往返时间及其偏差，重发超时就是比往返时间和偏差的和稍大一点的数值，在Unix以及windows都是以0.5秒为单位，因此重发超时都是0.5秒的整数倍，数据被重发后还是收不到确认应答会再次重发，等待确认应答的时间会以2倍4倍的指数函数延长，数据也不会无限重发，到达一定次数后，会认为对端主机故障，强制关闭连接。</p>
+<h4 id="连接管理"><a href="#连接管理" class="headerlink" title="连接管理"></a>连接管理</h4><p>TCP提供面向有连接的通信传输。面向有连接指在数据通信之前先做好通信两端的准备工作。</p>
+<p>在数据通信之前，TCP发送一个SYN包请求建立连接，接收端返回一个包含针对SYN的确认应答以及请求建立连接的SYN包给发送端，发送端再发送一个确认应答，这样就建立了一个TCP连接，需要发送三个包，也被称为三次握手。</p>
+<p>连接的建立和关闭：<br><img src="https://i.loli.net/2018/08/11/5b6eae9ce82fe.png" alt="建立连接"></p>
+<p>结束连接需要四个包，客户端发送请求切断连接（FIN），服务端发送一个确认应答作为返回，然后服务端发送一个请求切断连接（FIN),客户端返回一个确认应答，连接关闭。</p>
+<h4 id="TCP以段为单位发送数据"><a href="#TCP以段为单位发送数据" class="headerlink" title="TCP以段为单位发送数据"></a>TCP以段为单位发送数据</h4><p>在建立TCP连接的同时，也可以确定发送数据包的单位，称其为最大消息长度（MSS: maximun segment size), TCP传送大量数据时，以MSS的大小将数据分割发送，重发也是以MSS为单位。MSS是在三次握手的时候，两端的主机发出建立连接的请求时会在TCP首部写入MSS选项，然后在两者之间较小的值投入使用</p>
+<h4 id="使用窗口控制提高速度"><a href="#使用窗口控制提高速度" class="headerlink" title="使用窗口控制提高速度"></a>使用窗口控制提高速度</h4><p>TCP以一个段为单位，每发一个段进行一次确认应答的处理，但这样可能会很慢。TCP引入窗口的概念，确认应答不再是以每个分段，而是更大的单位进行确认，也就是说，发送端主机在发送一个段以后不必要一直等待确认应答，而是继续发送。窗口大小就是无需等待确认应答而可以发送数据的最大值。这个机制使用了大量的缓冲区，发送端主机在等到确认应答返回之前，必须在缓冲区中保留相关数据，收到确认应答，则可以在缓冲区清楚。</p>
+<h4 id="窗口控制与重发控制"><a href="#窗口控制与重发控制" class="headerlink" title="窗口控制与重发控制"></a>窗口控制与重发控制</h4><p>在没有使用窗口控制的时候，没有受到确认应答的数据都会被重发，而使用了窗口控制，某些确认应答即使丢失也无需重发。窗口在一定程度上较大时，即使有少部分的确认应答丢失也不会进行数据重发，可以通过下一个确认应答进行确认</p>
+<p><img src="https://i.loli.net/2018/08/11/5b6eafcc8a43f.png" alt=""></p>
+<p>当某个段丢失时，接收主机如果收到一个应该接收的序号以外的数据时，会针对当前为止收到的数据返回确认应答，并将接收的序号以外的数据暂时保存在缓冲区中。</p>
+<p>如下图所示，1001到2000的段数据丢失，发送端会一直收到序号为1001的确认应答，，当连续收到3次同一个确认应答，将对所对应的数据进行重发，这种机制比超时管理更加高效，被称作高速重发控制。注意2001到7000的这几段的确认应答都是1001，但数据保存在缓冲区，因此在收到1001到2000的段时，根据已收到的数据返回确认应答7001，表示已接受1～7000字节的数据。</p>
+<p><img src="https://i.loli.net/2018/08/11/5b6eb2132d29f.png" alt="屏幕快照 2018-08-11 下午5.58.16.png"></p>
+<h4 id="流控制"><a href="#流控制" class="headerlink" title="流控制"></a>流控制</h4><p>TCP提供一种机制可以让发送端根据接收端的实际接收能力控制发送的数据量，就是所谓的流控制。具体来说，接收端主机向发送端主机通知自己可以接收数据的大小，于是发送端发送不超过这个限度的数据，这个大小限度就称作窗口大小。TCP首部中有一个字段来通知窗口大小，接收主机将自己可以接收的缓冲区的大小放入这个字段通知给发送端，值越大，说明网路吞吐量越高。窗口大小会在接收主机缓冲区面临数据溢出时被设置为更小的值通知发送端，以控制数据发送量。</p>
+<p><img src="https://i.loli.net/2018/08/11/5b6eb4cbc28d1.png" alt="屏幕快照 2018-08-11 下午6.10.01.png"></p>
+<h4 id="拥塞控制"><a href="#拥塞控制" class="headerlink" title="拥塞控制"></a>拥塞控制</h4><p>计算机网络处在一个共享的环境，有可能因为其他主机之间的通信使得网络拥堵，网络拥堵时，突然发送一个较大量的数据，可能会导致整个网络的瘫痪，TCP为了防止该问题出现，会通过一个叫做慢启动的算法得出的数值，对发送的数据量进行控制。</p>
+<p>为了调节发送端需要发送数据的量，定义了一个叫做拥塞窗口的概念，在慢启动的时候，将拥塞窗口的大小设置为1个数据段，之后每收到一个确认应答，拥塞窗口的值就加1。发送数据包时，比较拥塞窗口的大小与接收端主机通知的窗口大小，发送一个比二者之间较小的值还要小的数据量。不过随着确认应答的增加，拥塞窗口会以指数级的速度增长，因此引入了慢启动阈值的概念，如果拥塞窗口的值超出这个阀值，在每收到一次确认应答时，只允许以（1个数据段的字节数）*（1个数据段的字节数）/（拥塞窗口的字节数）的比例放大拥塞窗口。</p>
+<p><img src="https://i.loli.net/2018/08/12/5b6ff3b69059e.png" alt="屏幕快照 2018-08-12 下午4.50.39.png"></p>
+<p>拥塞窗口越大，确认应答的数目也会增加，不过随着每收到一个确认应答，其涨幅也会逐渐减少，甚至小过一个数据段的字节数，因此，拥塞窗口的大小会呈直线上升的趋势。</p>
+<p>TCP的通信开始时，并没有设置相应的慢启动阈值，而是在超时重发时，才会设置为当时拥塞窗口一半的大小。</p>
+<p>重复确认应答而触发的高速重发与超时重发机制的处理多少有些不同，前者要求至少三次的确认应答数据段到达对方主机后才会出发，相比后者网络的拥堵要轻一些。</p>
+<p>一般情况下，窗口越大，越会形成高吞吐的通信。当tcp通信开始后，网络吞吐量会逐渐上升，但是随着网络拥堵的发生吞吐量也会急速下降，于是会再次你如吞吐量慢慢上升的过程，因此tcp吞吐量的特点就好像是在逐步占领网络带宽的感觉。</p>
+<h3 id="提高网络利用率的规范"><a href="#提高网络利用率的规范" class="headerlink" title="提高网络利用率的规范"></a>提高网络利用率的规范</h3><h4 id="Nagle算法"><a href="#Nagle算法" class="headerlink" title="Nagle算法"></a>Nagle算法</h4><p>TCP为了提高网络的利用率，经常使用一个叫做Nagle的算法，该算法是指发送端即使还有应该发送的数据，但如果这部分数据很少的话，则进行延迟发送的一种处理机制。具体来说，需要满足下列条件之一才能发送数据，否则会暂时等待一段时间再进行数据发送。</p>
+<ul>
+<li>已发送的数据都已经收到确认应答</li>
+<li>可以发送最大段长度(MSS）的数据</li>
+</ul>
+<p>根据这个算法虽然网络利用率可以提高，但可能会发生延迟。</p>
+<h4 id="延迟确认应答"><a href="#延迟确认应答" class="headerlink" title="延迟确认应答"></a>延迟确认应答</h4><p>接收数据的主机如果每次都立刻回复确认应答的话，可能会返回一个较小的窗口，那是因为刚接收完数据，缓冲区已满。<br>当某个接收端收到这个小窗口的通知以后，会以此为上限发送数据，从而又降低了网络的利用率。为此，引入了一个方法，就是收到数据以后并不立即返回确认应答，而是延迟一段时间的机制。</p>
+<ul>
+<li>在没有收到2*最大段长度的数据为止不做确认应答</li>
+<li>其他情况下，最大延迟0.5秒发送确认应答（很多操作系统设置为0.2秒左右)</li>
+</ul>
+<p>事实上，大可不必为每一个数据段都进行一次确认应答。TCP采用滑动窗口的控制机制，因此通常确认应答少一些也无妨。tcp文件传输中，绝大多数是每两个数据段返回一次确认应答。</p>
+<h3 id="捎带应答"><a href="#捎带应答" class="headerlink" title="捎带应答"></a>捎带应答</h3><p>根据应用层协议，发送的消息到达对端，对端处理之后会返回一个回执。TCP的确认应答和回执数据可以通过一个包发送，这种方式叫捎带应答。<br>如果接收数据以后立即返回确认应答，则无法实现捎带应答，也就是说如果没有启用延迟确认应答就无法实现捎带应答。延迟确认应答是能够提高网络利用率而降低计算机处理负荷的一种较优的处理机制。</p>
+<h3 id="UDP"><a href="#UDP" class="headerlink" title="UDP"></a>UDP</h3><p>面向无连接，通常用于一下几个方面</p>
+<ol>
+<li>包总量较少的通信（DNS, SNMP等）</li>
+<li>视频音频等多媒体通信（即时通信）</li>
+<li>限定于LAN等特定网络中的应用通信</li>
+<li>广播通信（广播，多播)</li>
+</ol>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/06/09/WSGI简介/" rel="next" title="WSGI简介">
+                <i class="fa fa-chevron-left"></i> WSGI简介
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/09/10/Linux高性能服务器编程读书笔记/" rel="prev" title="Linux高性能服务器编程读书笔记">
+                Linux高性能服务器编程读书笔记 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">along</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">49</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#IP"><span class="nav-number">1.</span> <span class="nav-text">IP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#TCP"><span class="nav-number">2.</span> <span class="nav-text">TCP</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#序列号和确认应答"><span class="nav-number">2.1.</span> <span class="nav-text">序列号和确认应答</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#重发超时的确定"><span class="nav-number">2.2.</span> <span class="nav-text">重发超时的确定</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#连接管理"><span class="nav-number">2.3.</span> <span class="nav-text">连接管理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#TCP以段为单位发送数据"><span class="nav-number">2.4.</span> <span class="nav-text">TCP以段为单位发送数据</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#使用窗口控制提高速度"><span class="nav-number">2.5.</span> <span class="nav-text">使用窗口控制提高速度</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#窗口控制与重发控制"><span class="nav-number">2.6.</span> <span class="nav-text">窗口控制与重发控制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#流控制"><span class="nav-number">2.7.</span> <span class="nav-text">流控制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#拥塞控制"><span class="nav-number">2.8.</span> <span class="nav-text">拥塞控制</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#提高网络利用率的规范"><span class="nav-number">3.</span> <span class="nav-text">提高网络利用率的规范</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Nagle算法"><span class="nav-number">3.1.</span> <span class="nav-text">Nagle算法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#延迟确认应答"><span class="nav-number">3.2.</span> <span class="nav-text">延迟确认应答</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#捎带应答"><span class="nav-number">4.</span> <span class="nav-text">捎带应答</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#UDP"><span class="nav-number">5.</span> <span class="nav-text">UDP</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">along</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

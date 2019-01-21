@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Pyhton2首先明确一些概念： 位(bit)：二进制中的0或1都占一个位 字节(byte): 八个位 ascii: 主要适用于现代英语的编码系统，定义了128个字符，一个字符用一字节表示 unicode: 英语字符用ascii的128个符号就够了，但是其他国家的文字，因为有更多的字符，肯定不够，unicode就是这样一个给世界上所有文字符号都编码的系统，规定了每个符号的二进制代码 utf-8:">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Python中的字符编码总结">
+<meta property="og:url" content="http://goalong.github.io/2019/01/21/Python中的字符编码总结/index.html">
+<meta property="og:site_name" content="along&#39;s space">
+<meta property="og:description" content="Pyhton2首先明确一些概念： 位(bit)：二进制中的0或1都占一个位 字节(byte): 八个位 ascii: 主要适用于现代英语的编码系统，定义了128个字符，一个字符用一字节表示 unicode: 英语字符用ascii的128个符号就够了，但是其他国家的文字，因为有更多的字符，肯定不够，unicode就是这样一个给世界上所有文字符号都编码的系统，规定了每个符号的二进制代码 utf-8:">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-01-21T08:49:40.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Python中的字符编码总结">
+<meta name="twitter:description" content="Pyhton2首先明确一些概念： 位(bit)：二进制中的0或1都占一个位 字节(byte): 八个位 ascii: 主要适用于现代英语的编码系统，定义了128个字符，一个字符用一字节表示 unicode: 英语字符用ascii的128个符号就够了，但是其他国家的文字，因为有更多的字符，肯定不够，unicode就是这样一个给世界上所有文字符号都编码的系统，规定了每个符号的二进制代码 utf-8:">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://goalong.github.io/2019/01/21/Python中的字符编码总结/">
+
+
+
+
+
+  <title>Python中的字符编码总结 | along's space</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">along's space</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://goalong.github.io/2019/01/21/Python中的字符编码总结/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="along">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="along's space">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Python中的字符编码总结</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-21T14:52:15+08:00">
+                2019-01-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="Pyhton2"><a href="#Pyhton2" class="headerlink" title="Pyhton2"></a>Pyhton2</h3><p>首先明确一些概念：</p>
+<p>位(bit)：二进制中的0或1都占一个位</p>
+<p>字节(byte): 八个位</p>
+<p>ascii: 主要适用于现代英语的编码系统，定义了128个字符，一个字符用一字节表示</p>
+<p>unicode: 英语字符用ascii的128个符号就够了，但是其他国家的文字，因为有更多的字符，肯定不够，unicode就是这样一个给世界上所有文字符号都编码的系统，规定了每个符号的二进制代码</p>
+<p>utf-8: 是使用最广的一种Unicode的实现方式，其他的还有UTF-16、UTF-32，不过不怎么使用。UTF-8 最大的一个特点，就是它是一种变长的编码方式。它可以使用1~4个字节表示一个符号，UTF-8是ascii的超集，原来在ascii的字符在UTF-8中使用同样的数字代表，也依然只占一个字节，汉字基本是占3字节。UTF-8的实现非常巧妙，对于一串字节，虽然有许多种组合方式，但只能被正确的解释成一个字符串。</p>
+<p>在python2中，有str和unicode两种字符类型，str代表的是一串字节的序列(一串8bit的序列），unicode代表的一串字符（其中的每一个是一个unicode字符)。当然还有一种类型叫bytes,  不过在python2中bytes只是str的别名。</p>
+<p>str和unicode的互相转换：</p>
+<pre><code>str  -&gt; decode(&apos;the_coding_of_str&apos;) -&gt; unicode
+unicode -&gt; encode(&apos;the_coding_you_want&apos;) -&gt; str
+</code></pre><p>举个例子：</p>
+<pre><code>&gt;&gt;&gt;a = &apos;hi你&apos;  
+&gt;&gt;&gt;a
+&apos;hi\xe4\xbd\xa0&apos;   # &apos;你&apos;占用了三个字节表示
+&gt;&gt;&gt;len(a)
+5
+&gt;&gt;&gt;type(a)
+&lt;type &apos;str&apos;&gt;
+&gt;&gt;&gt;b = a.decode(&apos;utf-8&apos;)
+&gt;&gt;&gt; b
+u&apos;hi\u4f60&apos;
+&gt;&gt;&gt;type(b)
+&lt;type &apos;unicode&apos;&gt;
+&gt;&gt;&gt;len(b)
+3
+</code></pre><p>使用建议：接收到一个str，立即将其转换为unicode，然后对这个unicode类型的字符串进行所有的逻辑处理，最后需要保存到文件或记录到数据库时，再将unicode转换为str。</p>
+<h3 id="python3"><a href="#python3" class="headerlink" title="python3"></a>python3</h3><p>python3里处理unicode简单了一些, str代表的就是真正的unicode字符串，bytes代表字节的序列，更加符合名称对应的含义了。</p>
+<pre><code>&gt;&gt;&gt; a = &apos;hi你&apos;
+&gt;&gt;&gt; len(a)
+3
+&gt;&gt;&gt; a[2]
+&apos;你&apos;
+&gt;&gt;&gt; b = a.encode(&apos;utf-8&apos;)
+&gt;&gt;&gt; b
+b&apos;hi\xe4\xbd\xa0&apos;
+&gt;&gt;&gt; len(b)
+5 
+&gt;&gt;&gt; type(b)
+&lt;class &apos;bytes&apos;&gt;
+&gt;&gt;&gt; type(a)
+&lt;class &apos;str&apos;&gt;
+</code></pre><p>参考：</p>
+<p><a href="http://www.pgbovine.net/unicode-python.htm" target="_blank" rel="noopener">Unicode strings in Python: A basic tutorial</a></p>
+<p><a href="http://wklken.me/posts/2013/08/31/python-extra-coding-intro.html#" target="_blank" rel="noopener">PYTHON-进阶-编码处理小结</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/01/07/mysql技术内幕Innodb存储引擎读书笔记/" rel="next" title="Mysql技术内幕Innodb存储引擎读书笔记">
+                <i class="fa fa-chevron-left"></i> Mysql技术内幕Innodb存储引擎读书笔记
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">along</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">49</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Pyhton2"><span class="nav-number">1.</span> <span class="nav-text">Pyhton2</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#python3"><span class="nav-number">2.</span> <span class="nav-text">python3</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">along</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

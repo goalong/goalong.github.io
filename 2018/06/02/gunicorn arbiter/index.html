@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Arbiter这个类是master进程工作的核心，主要的工作就是通过监听信号事件来维护worker进程的数量，以及通过SIGHUP/USR2等信号对应用进行热更新或者在线升级。 Arbiter类的外部调用只有Arbiter(self).run()这一句，也就是init和run两个方法，这里的self是一个WSGIApplication的实例。 Arbiter比较重要的方法有下列几个：  setup">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Gunicorn源码阅读二：Arbiter大魔王">
+<meta property="og:url" content="http://goalong.github.io/2018/06/02/gunicorn arbiter/index.html">
+<meta property="og:site_name" content="along&#39;s space">
+<meta property="og:description" content="Arbiter这个类是master进程工作的核心，主要的工作就是通过监听信号事件来维护worker进程的数量，以及通过SIGHUP/USR2等信号对应用进行热更新或者在线升级。 Arbiter类的外部调用只有Arbiter(self).run()这一句，也就是init和run两个方法，这里的self是一个WSGIApplication的实例。 Arbiter比较重要的方法有下列几个：  setup">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-01-21T08:44:46.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Gunicorn源码阅读二：Arbiter大魔王">
+<meta name="twitter:description" content="Arbiter这个类是master进程工作的核心，主要的工作就是通过监听信号事件来维护worker进程的数量，以及通过SIGHUP/USR2等信号对应用进行热更新或者在线升级。 Arbiter类的外部调用只有Arbiter(self).run()这一句，也就是init和run两个方法，这里的self是一个WSGIApplication的实例。 Arbiter比较重要的方法有下列几个：  setup">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://goalong.github.io/2018/06/02/gunicorn arbiter/">
+
+
+
+
+
+  <title>Gunicorn源码阅读二：Arbiter大魔王 | along's space</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">along's space</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://goalong.github.io/2018/06/02/gunicorn arbiter/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="along">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="along's space">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Gunicorn源码阅读二：Arbiter大魔王</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-02T00:00:00+08:00">
+                2018-06-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Arbiter这个类是master进程工作的核心，主要的工作就是通过监听信号事件来维护worker进程的数量，以及通过SIGHUP/USR2等信号对应用进行热更新或者在线升级。</p>
+<p>Arbiter类的外部调用只有Arbiter(self).run()这一句，也就是<strong>init</strong>和run两个方法，这里的self是一个WSGIApplication的实例。</p>
+<p>Arbiter比较重要的方法有下列几个：</p>
+<ol>
+<li>setup, start, <strong>init</strong>: 初始化以及导入app配置的几个方法，例如worker类型和数量，监听地址等<br>init_signals, signal: 关于信号处理的方法，接收到某个信号后会自动触发相应的处理方法</li>
+<li>handle_xxx: 一系列以handle_作为前缀的方法，是各个信号对应的实际的处理方法</li>
+<li>kill_worker, kill_workers: 杀死worker进程</li>
+<li>spawn_worker, spawn_workers: 创建worker进程</li>
+<li>run: 主循环, Arbiter的核心，通过不断循环来监听信号</li>
+<li>sleep, wakeup: 休眠以及唤醒主循环</li>
+</ol>
+<p>用一句话来概括Arbiter的工作其实就是，有一个主循环不断监听不同的信号事件，有信号的话调用相应的处理函数，以此来维护worker的数量。所以，主要就是这么个工作。下面来具体看一下几个方法：</p>
+<h3 id="init-setup-方法"><a href="#init-setup-方法" class="headerlink" title="init, setup 方法"></a><strong>init</strong>, setup 方法</h3><pre><code>def __init__(self, app):
+    os.environ[&quot;SERVER_SOFTWARE&quot;] = SERVER_SOFTWARE
+    self._num_workers = None
+    self._last_logged_active_worker_count = None
+    self.log = None
+    self.setup(app)
+    self.pidfile = None
+    self.systemd = False
+    self.worker_age = 0
+    self.reexec_pid = 0
+    self.master_pid = 0
+    self.master_name = &quot;Master&quot;
+
+    cwd = util.getcwd()
+
+    args = sys.argv[:]
+    args.insert(0, sys.executable)
+
+    # init start context 
+    self.START_CTX = {
+        &quot;args&quot;: args,
+        &quot;cwd&quot;: cwd,
+        0: sys.executable
+    }
+def setup(self, app):
+    self.app = app
+    self.cfg = app.cfg
+
+    if self.log is None:
+        self.log = self.cfg.logger_class(app.cfg)
+
+    # reopen files
+    if &apos;GUNICORN_FD&apos; in os.environ:
+        self.log.reopen_files()
+
+    self.worker_class = self.cfg.worker_class # worker类型
+    self.address = self.cfg.address # 监听地址
+    self.num_workers = self.cfg.workers # worker数量
+    self.timeout = self.cfg.timeout
+    self.proc_name = self.cfg.proc_name  # master进程名
+
+    self.log.debug(&apos;Current configuration:\n{0}&apos;.format(
+        &apos;\n&apos;.join(
+            &apos;  {0}: {1}&apos;.format(config, value.value)
+            for config, value
+            in sorted(self.cfg.settings.items(),
+                      key=lambda setting: setting[1]))))
+
+    # set enviroment&apos; variables
+    if self.cfg.env:
+        for k, v in self.cfg.env.items():
+            os.environ[k] = v
+
+    if self.cfg.preload_app:  # 预先加载app
+        self.app.wsgi()
+</code></pre><p>可以看到主要是对一些属性赋值，进行初始化, setup方法获取到app的worker类型，配置worker数量，监听地址以及日志配置等</p>
+<h3 id="run方法"><a href="#run方法" class="headerlink" title="run方法"></a>run方法</h3><pre><code>def run(self):
+    &quot;Main master loop.&quot;
+    self.start()
+    util._setproctitle(&quot;master [%s]&quot; % self.proc_name)  # 设置master进程名
+
+    try:
+        self.manage_workers() # 调控worker数量
+
+        while True:
+            self.maybe_promote_master()
+
+            sig = self.SIG_QUEUE.pop(0) if self.SIG_QUEUE else None  # 从信号队列里面取出最早的一个信号
+            if sig is None:
+                self.sleep() # 进入睡眠或者立即
+                self.murder_workers()
+                self.manage_workers()
+                continue
+
+            if sig not in self.SIG_NAMES:
+                self.log.info(&quot;Ignoring unknown signal: %s&quot;, sig)
+                continue
+
+            signame = self.SIG_NAMES.get(sig)
+            handler = getattr(self, &quot;handle_%s&quot; % signame, None)
+            if not handler:
+                self.log.error(&quot;Unhandled signal: %s&quot;, signame)
+                continue
+            self.log.info(&quot;Handling signal: %s&quot;, signame)
+            handler()
+            self.wakeup()
+    except StopIteration:
+        self.halt()
+    except KeyboardInterrupt:
+        self.halt()
+    except HaltServer as inst:
+        self.halt(reason=inst.reason, exit_status=inst.exit_status)
+    except SystemExit:
+        raise
+    except Exception:
+        self.log.info(&quot;Unhandled exception in main loop&quot;,
+                      exc_info=True)
+        self.stop(False)
+        if self.pidfile is not None:
+            self.pidfile.unlink()
+        sys.exit(-1)
+
+def start(self):
+    &quot;&quot;&quot;\
+    Initialize the arbiter. Start listening and set pidfile if needed.
+    &quot;&quot;&quot;
+    self.log.info(&quot;Starting gunicorn %s&quot;, __version__)
+
+    if &apos;GUNICORN_PID&apos; in os.environ:
+        self.master_pid = int(os.environ.get(&apos;GUNICORN_PID&apos;))
+        self.proc_name = self.proc_name + &quot;.2&quot;
+        self.master_name = &quot;Master.2&quot;
+
+    self.pid = os.getpid()
+    if self.cfg.pidfile is not None:
+        pidname = self.cfg.pidfile
+        if self.master_pid != 0:
+            pidname += &quot;.2&quot;
+        self.pidfile = Pidfile(pidname)
+        self.pidfile.create(self.pid)
+    self.cfg.on_starting(self)
+
+    self.init_signals()
+
+    if not self.LISTENERS:
+        fds = None
+        listen_fds = systemd.listen_fds()
+        if listen_fds:
+            self.systemd = True
+            fds = range(systemd.SD_LISTEN_FDS_START,
+                        systemd.SD_LISTEN_FDS_START + listen_fds)
+
+        elif self.master_pid:
+            fds = []
+            for fd in os.environ.pop(&apos;GUNICORN_FD&apos;).split(&apos;,&apos;):
+                fds.append(int(fd))
+
+        self.LISTENERS = sock.create_sockets(self.cfg, self.log, fds)
+
+    listeners_str = &quot;,&quot;.join([str(l) for l in self.LISTENERS])
+    self.log.debug(&quot;Arbiter booted&quot;)
+    self.log.info(&quot;Listening at: %s (%s)&quot;, listeners_str, self.pid)
+    self.log.info(&quot;Using worker: %s&quot;, self.cfg.worker_class_str)
+
+    # check worker class requirements
+    if hasattr(self.worker_class, &quot;check_config&quot;):
+        self.worker_class.check_config(self.cfg, self.log)
+
+    self.cfg.when_ready(self)
+</code></pre><p>首先调用了start方法，start方法处理创建pid文件以及创建socket列表,并调用init_signals注册信号事件。master和worker之间通过信号来通信，</p>
+<pre><code>def init_signals(self):
+        &quot;&quot;&quot;\
+        Initialize master signal handling. Most of the signals
+        are queued. Child signals only wake up the master.
+        &quot;&quot;&quot;
+    # close old PIPE
+    for p in self.PIPE:
+        os.close(p)
+
+    # initialize the pipe
+    self.PIPE = pair = os.pipe()
+    for p in pair:
+        util.set_non_blocking(p)
+        util.close_on_exec(p)
+
+    self.log.close_on_exec()
+
+    # initialize all signals
+    for s in self.SIGNALS:
+        signal.signal(s, self.signal)
+    signal.signal(signal.SIGCHLD, self.handle_chld)
+
+def signal(self, sig, frame):
+    if len(self.SIG_QUEUE) &lt; 5:
+        self.SIG_QUEUE.append(sig)
+        self.wakeup()
+def wakeup(self):
+    &quot;&quot;&quot;\
+    Wake up the arbiter by writing to the PIPE
+    &quot;&quot;&quot;
+    try:
+        os.write(self.PIPE[1], b&apos;.&apos;)
+    except IOError as e:
+        if e.errno not in [errno.EAGAIN, errno.EINTR]:
+            raise
+</code></pre><p>可以看到除了SIGCHLD信号外，其他信号的handler都是signal方法，也就是接收到这些信号之后都会调用signal方法来处理，<br>signal方法的工作就是将信号加入队列，然后调用wakeup方法，向  self.PIPE 写入数据用于唤醒.</p>
+<p>run方法在调用start方法之后调用了manage_workers方法，</p>
+<pre><code>def manage_workers(self):
+        &quot;&quot;&quot;\
+        Maintain the number of workers by spawning or killing
+        as required.
+        &quot;&quot;&quot;
+    if len(self.WORKERS.keys()) &lt; self.num_workers:
+        self.spawn_workers()
+
+    workers = self.WORKERS.items()
+    workers = sorted(workers, key=lambda w: w[1].age)
+    while len(workers) &gt; self.num_workers:
+        (pid, _) = workers.pop(0)
+        self.kill_worker(pid, signal.SIGTERM)
+
+    active_worker_count = len(workers)
+    if self._last_logged_active_worker_count != active_worker_count:
+        self._last_logged_active_worker_count = active_worker_count
+        self.log.debug(&quot;{0} workers&quot;.format(active_worker_count),
+                       extra={&quot;metric&quot;: &quot;gunicorn.workers&quot;,
+                              &quot;value&quot;: active_worker_count,
+                              &quot;mtype&quot;: &quot;gauge&quot;})
+</code></pre><p>self.WORKERS是保存当前运行的worker的字典，self.num_workers是想要维持的worker数量，通过对比当前运行的worker数量和num_workers, 少了就调用spawn_workers方法来创建，多了就调用kill_worker方法来杀死，这样就维持了num_workers数量的worker。</p>
+<p>在调用manage_workers方法之后，就是一个while的无限循环，检查信号队列中有没有未处理的信号，如果没有信号，调用sleep方法，sleep方法检测管道是否可读，可读说明接收到信号了会调用signal方法往信号队列里添加, 继续调用manage_workers来维持worker数量；如果有信号则找到其handler, handler方法以handle_为前缀，信号名为后缀，方便直接通过信号名来找到，找到handler然后运行，然后继续等待。</p>
+<h3 id="spawn-worker"><a href="#spawn-worker" class="headerlink" title="spawn_worker"></a>spawn_worker</h3><pre><code>def spawn_worker(self):
+    self.worker_age += 1
+    worker = self.worker_class(self.worker_age, self.pid, self.LISTENERS,
+                               self.app, self.timeout / 2.0,
+                               self.cfg, self.log)
+    self.cfg.pre_fork(self, worker)
+    pid = os.fork()
+    if pid != 0:
+        worker.pid = pid
+        self.WORKERS[pid] = worker
+        return pid
+
+    # Do not inherit the temporary files of other workers
+    for sibling in self.WORKERS.values():
+        sibling.tmp.close()
+
+    # Process Child
+    worker.pid = os.getpid()
+    try:
+        util._setproctitle(&quot;worker [%s]&quot; % self.proc_name)
+        self.log.info(&quot;Booting worker with pid: %s&quot;, worker.pid)
+        self.cfg.post_fork(self, worker)
+        worker.init_process()
+        sys.exit(0)
+    except SystemExit:
+        raise
+    except AppImportError as e:
+        self.log.debug(&quot;Exception while loading the application&quot;,
+                       exc_info=True)
+        print(&quot;%s&quot; % e, file=sys.stderr)
+        sys.stderr.flush()
+        sys.exit(self.APP_LOAD_ERROR)
+    except:
+        self.log.exception(&quot;Exception in worker process&quot;)
+        if not worker.booted:
+            sys.exit(self.WORKER_BOOT_ERROR)
+        sys.exit(-1)
+    finally:
+        self.log.info(&quot;Worker exiting (pid: %s)&quot;, worker.pid)
+        try:
+            worker.tmp.close()
+            self.cfg.worker_exit(self, worker)
+        except:
+            self.log.warning(&quot;Exception during worker exit:\n%s&quot;,
+                              traceback.format_exc())
+</code></pre><p> manage_workers中需要增加worker调用的是spawn_workers, 然后spawn_workers通过调用spawn_worker来创建worker。</p>
+<h3 id="wakeup-和-sleep-方法"><a href="#wakeup-和-sleep-方法" class="headerlink" title="wakeup 和 sleep 方法"></a>wakeup 和 sleep 方法</h3><p> 主进程接收信号并处理的机制中，有几次出现了self.PIPE这个管道，我一直不太清楚具体是如何运作的，在sleep方法和wakeup方法里使用了self.PIPE，看到<a href="https://www.zybuluo.com/orangleliu/note/302677" target="_blank" rel="noopener">gunicorn源码阅读笔记</a>这篇文章里的方法，我也将run方法中的sleep那一行注释了，并且加了一行print(time.time())，然后运行，果然发现了一些端倪，while循环执行的非常快，使用top命令可以看到该进程CPU占用一直维持在90%以上，甚至95%以上，于是便明白了这是减少master进程的资源消耗</p>
+<p> def sleep(self):<br>        “””\<br>        Sleep until PIPE is readable or we timeout.<br>        A readable PIPE means a signal occurred.<br>        “””<br>        try:<br>            ready = select.select([self.PIPE[0]], [], [], 1.0) # 要么PIPE可读立即返回，要么等待超时<br>            if not ready[0]:<br>                return<br>            while os.read(self.PIPE[0], 1):<br>                pass<br>        except (select.error, OSError) as e:</p>
+<pre><code>        # TODO: select.error is a subclass of OSError since Python 3.3.
+        error_number = getattr(e, &apos;errno&apos;, e.args[0])
+        if error_number not in [errno.EAGAIN, errno.EINTR]:
+            raise
+    except KeyboardInterrupt:
+        sys.exit()
+
+def wakeup(self):
+    &quot;&quot;&quot;\
+    Wake up the arbiter by writing to the PIPE
+    &quot;&quot;&quot;
+    try:
+        os.write(self.PIPE[1], b&apos;.&apos;)
+    except IOError as e:
+        if e.errno not in [errno.EAGAIN, errno.EINTR]:
+            raise
+</code></pre><p>注意sleep方法会调用select函数来检测管道是否可读，select函数的最后一个参数1.0时timeout的值，也就是select会花1秒钟来检测这个管道是否可读，超过1秒就返回，就是这个1秒钟的timeout，保证了没有信号时while循环不会循环的太快以至于CPU占用过高，在把sleep这个方法取消注释并运行后，发现进程CPU占用立即降到了0.1%左右，证实了我们的猜想。由此可以清楚的知道这个管道的作用了，当有信号到达时，往信号队列里面添加该信号，之后会调用wakeup方法，wakeup方法会往管道里写入数据，主循环在执行sleep的时候，select可以读取到管道中有数据而立即返回，不用再等待1秒的timeout。</p>
+<p>sleep让master进程每一轮循环不要那么快，没信号的时候睡眠状态，减少资源消耗。</p>
+<p>wakeup和sleep配合，master进程处睡眠的状态，当有信号时往管道里写数据，select检测到管道可读立即返回，不用继续休眠，随后在下一轮循环中从信号队列中取出信号进行处理。</p>
+<p>最后来总结一下Arbiter的主要流程：</p>
+<ol>
+<li>根据传入app的配置进行初始化，例如worker的数量，worker的类型，注册信号处理函数等</li>
+<li>开始主循环，调用manage_workers维护一定数量的worker</li>
+<li>主循环从检测信号队列及管道，无信号则睡眠，有信号则立即唤醒并在下一个循环中处理信号</li>
+</ol>
+<p>参考:</p>
+<p><a href="https://meta.tn/a/3e8eb2aa5bf4febad39b6138a873637b5b8f8696b0f92dc808df9a0357d5084e" target="_blank" rel="noopener">https://meta.tn/a/3e8eb2aa5bf4febad39b6138a873637b5b8f8696b0f92dc808df9a0357d5084e</a></p>
+<p><a href="http://rur.logdown.com/posts/2015/04/03/259224" target="_blank" rel="noopener">http://rur.logdown.com/posts/2015/04/03/259224</a></p>
+<p><a href="https://blog.csdn.net/qq_33339479/article/details/78431209" target="_blank" rel="noopener">https://blog.csdn.net/qq_33339479/article/details/78431209</a>   </p>
+<p><a href="http://www.cnblogs.com/xybaby/p/6297089.html" target="_blank" rel="noopener">http://www.cnblogs.com/xybaby/p/6297089.html</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/05/28/gunicorn-1/" rel="next" title="Gunicorn源码阅读一：观其大略">
+                <i class="fa fa-chevron-left"></i> Gunicorn源码阅读一：观其大略
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/06/07/gunicorn-worker/" rel="prev" title="Gunicorn源码阅读三：Worker">
+                Gunicorn源码阅读三：Worker <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">along</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">49</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#init-setup-方法"><span class="nav-number">1.</span> <span class="nav-text">init, setup 方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#run方法"><span class="nav-number">2.</span> <span class="nav-text">run方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#spawn-worker"><span class="nav-number">3.</span> <span class="nav-text">spawn_worker</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#wakeup-和-sleep-方法"><span class="nav-number">4.</span> <span class="nav-text">wakeup 和 sleep 方法</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">along</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

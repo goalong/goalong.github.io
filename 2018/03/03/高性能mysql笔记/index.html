@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="mysql,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="高性能mysql 笔记读锁是共享的，写锁是排他的，一个写锁会阻塞其他的写锁和读锁，确保在给定时间只有一个写入，防止其他用户的读取。加锁消耗资源，mysql中由存储引擎实现自己的锁策略和锁粒度。表锁，对表进行写操作前需要获得写锁，会阻塞其他用户的所有读写操作行级锁最大程度支持并发处理，也带来最大的锁开销。事务，一个独立的工作单元，要么全部执行成功，要么全部失败。事务的acid特性：原子性，一个事务是">
+<meta name="keywords" content="mysql">
+<meta property="og:type" content="article">
+<meta property="og:title" content="高性能mysql 笔记">
+<meta property="og:url" content="http://goalong.github.io/2018/03/03/高性能mysql笔记/index.html">
+<meta property="og:site_name" content="along&#39;s space">
+<meta property="og:description" content="高性能mysql 笔记读锁是共享的，写锁是排他的，一个写锁会阻塞其他的写锁和读锁，确保在给定时间只有一个写入，防止其他用户的读取。加锁消耗资源，mysql中由存储引擎实现自己的锁策略和锁粒度。表锁，对表进行写操作前需要获得写锁，会阻塞其他用户的所有读写操作行级锁最大程度支持并发处理，也带来最大的锁开销。事务，一个独立的工作单元，要么全部执行成功，要么全部失败。事务的acid特性：原子性，一个事务是">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-01-21T08:49:40.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="高性能mysql 笔记">
+<meta name="twitter:description" content="高性能mysql 笔记读锁是共享的，写锁是排他的，一个写锁会阻塞其他的写锁和读锁，确保在给定时间只有一个写入，防止其他用户的读取。加锁消耗资源，mysql中由存储引擎实现自己的锁策略和锁粒度。表锁，对表进行写操作前需要获得写锁，会阻塞其他用户的所有读写操作行级锁最大程度支持并发处理，也带来最大的锁开销。事务，一个独立的工作单元，要么全部执行成功，要么全部失败。事务的acid特性：原子性，一个事务是">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://goalong.github.io/2018/03/03/高性能mysql笔记/">
+
+
+
+
+
+  <title>高性能mysql 笔记 | along's space</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">along's space</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://goalong.github.io/2018/03/03/高性能mysql笔记/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="along">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="along's space">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">高性能mysql 笔记</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-03T00:00:00+08:00">
+                2018-03-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h4 id="高性能mysql-笔记"><a href="#高性能mysql-笔记" class="headerlink" title="高性能mysql 笔记"></a>高性能mysql 笔记</h4><p>读锁是共享的，写锁是排他的，一个写锁会阻塞其他的写锁和读锁，确保在给定时间只有一个写入，防止其他用户的读取。<br>加锁消耗资源，mysql中由存储引擎实现自己的锁策略和锁粒度。<br>表锁，对表进行写操作前需要获得写锁，会阻塞其他用户的所有读写操作<br>行级锁最大程度支持并发处理，也带来最大的锁开销。<br>事务，一个独立的工作单元，要么全部执行成功，要么全部失败。<br>事务的acid特性：<br>原子性，一个事务是一个不可分割的最小工作单元，要么全部执行成功，要么全部失败回滚<br>一致性， 数据库总是从一个一致性的状态转换到另一个一致性的状态<br>隔离性，通常来说，一个事务的修改在最终提交之前对其他事务是不可见的，但根据隔离级别有例外<br>持久性，一旦事务提交，其所做的修改就会永久保存到数据库中，即使系统崩溃，修改的数据也不会丢失。持久性有点模糊，因为也分很多级别</p>
+<p>隔离级别<br>每一种级别规定了一个事务的修改在事务内和事务间是否可见<br>read uncommitted, 未提交读，事务中的修改即使未提交，对其他事务也是可见的，很少使用<br>read committed, 提交读，一个事务开始时，只能看到已经提交的事务的修改，该事务在提交之前，所做的修改对其他事务不可见，不可重复读，因为每次读取都是读取最新的提交<br>repeatable read, 可重复读，解决了脏读的问题，在同一个事务多次执行同样的查询，结果是一致的，读取事务开始时的状态，会有幻读现象<br>串行执行， 强制事务串行执行，不能并发</p>
+<p>mysql默认的是可重复读级别。</p>
+<h4 id="多版本并发控制"><a href="#多版本并发控制" class="headerlink" title="多版本并发控制"></a>多版本并发控制</h4><p>可以认为MVCC是行级锁的一个变种，在很多情况下避免了加锁操作，因此开销更低。<br>InnoDB的MVCC是通过在每行记录后面保存两个隐藏的列来实现的。这两个列一个记录了行的创建时间，一个记录了行的过期时间（或删除时间）。当然存储的并不是实际的时间值，而是系统版本号。每开始一个新的事务，系统版本号都会自动递增。事务开始时刻的系统版本号会作为事务的版本号，用来和查询到的每行记录的版本号进行比较。下面看一下在REPEATABLE READ隔离级别下，MVCC具体是如何操作的。</p>
+<p>SELECT</p>
+<pre><code>InnoDB会根据一下两个条件检查每行记录：
+a. InnoDB只查找版本号小于等于当前事务版本号的数据行。这样可以确保事务读取的行，要么是事务开始前存在的，要么是事务自身插入或修改的。
+b. 行的删除版本要么未定义，要么大于当前事务版本号。这样确保事务读取的行，在事务开始之前未被删除。
+</code></pre><p>INSERT</p>
+<pre><code>InnoDB为新插入的每一行保存当前系统版本号作为行版本号。
+</code></pre><p>DELETE</p>
+<pre><code>InnoDB为删除的每一行保存当前系统版本号作为行删除标识。
+</code></pre><p>UPDATE</p>
+<pre><code>InnoDB为插入一行新记录，保存当前系统版本号作为行版本号，同时保存当前系统版本号到原来的行作为行删除标识。
+</code></pre><p>保存这两个额外系统版本号，使大多数读操作都可以不用加锁。这样设计使得读数据操作很简单，性能很好，并且也能保证只会读取到符合标准的行。不足之处是需要额外的存储空间，需要做更多的行检查工作，以及一些额外的维护工作。</p>
+<p>基准测试 和 性能剖析部分， 略读了，暂不打算深入。</p>
+<p>整数类型比字符串类型快<br>decimal（18，9）表示小数点前9个数字，小数点后面9个数字。<br>orm可能造成性能噩梦，因为可能生成不高效的数据类型及长度。</p>
+<p>范式，每个事实数据出现并且只出现一次；反范式，信息是冗余的，可能存储在多个地方。</p>
+<p>范式化的优点： 更新通常较快，因为数据没有重复，只需要少量修改，表通常更小，可以更好的放在内存中，因此操作会比较快；<br>缺点：通常需要关联，范式化将列存在不同的表中</p>
+<p>反范式化，所有数据在一张表中，很好的避免关联</p>
+<p>mysql alter table, 大部分的操作是锁表用新的结构创建空表，然后导入数据，删除旧表，并重命名新表。</p>
+<p>schema设计原则：<br>使用小而简单的合适数据类型，避免使用null值<br>尽量使用整型定义标识列</p>
+<p>索引优化是对查询性能优化最重要的手段</p>
+<p>前缀索引是使索引更小，更快的有效方法，但mysql无法使用前缀索引做order by和group by.</p>
+<p>联合索引时列的顺序很重要，因为是先按最左列进行排序，然后第二列。有一个经验是将选择性最高的列放在索引最左边，但具体应以查询条件来考虑。</p>
+<p>聚簇索引并不是一种单独的索引类型，而是一种数据存储方式，数据行存储在叶子页上。</p>
+<p>二级索引的叶子节点存储了主键值，通过主键值再到聚簇索引中找到数据行。</p>
+<p>使用innodb时应该尽可能按主键顺序插入数据，尽可能使用单调增加的聚簇键的值来插入新行。</p>
+<p>一个索引包含或者说覆盖所有需要查询的字段的值，称之为覆盖索引。<br>覆盖索引好处： 索引条目通常远小于数据行大小，能极大减少数据访问量，更容易全部放入内存</p>
+<p>mysql有两种生成有序结果的方式：通过排序操作或者按索引顺序扫描。只有当索引的列顺序和order by子句的顺序完全一致，并且所有列的排序方向（倒序或正序）都一样时，mysql才能用索引来对结果排序。</p>
+<p>增加新索引会导致insert，update，delete等操作变慢。</p>
+<p>索引可以让查询锁定更少的行，索引能减少innodb访问的行数，从而减少锁的数量。</p>
+<p>innodb在二级索引上使用读锁，但访问主键需要写锁</p>
+<h4 id="在线约会网站的例子-索引案例学习"><a href="#在线约会网站的例子-索引案例学习" class="headerlink" title="在线约会网站的例子 索引案例学习"></a>在线约会网站的例子 索引案例学习</h4><p>对于组合索引，查询只能使用索引的最左前缀，直到遇到第一个范围条件列，范围查询无法使用索引</p>
+<p>age列一般放在索引最后，就是因为多半是范围查询<br>（sex, country, age), 把sex列放在最前因为几乎所有查询都会用到sex列，即使不用，也可以在查询中使用 sex in (m, f)来让mysql选择该索引</p>
+<p>todo: 对于排序后的结果，翻页到比较靠后时查询会很慢，解决办法：限制用户能够翻页的数量</p>
+<h4 id="查询性能优化"><a href="#查询性能优化" class="headerlink" title="查询性能优化"></a>查询性能优化</h4><p>向mysql发送一个请求，发生了什么<br>1.客户端发送一条查询给服务器</p>
+<ol start="2">
+<li>服务器先检查缓存，如果命中，立即返回缓存中的结果，否则继续</li>
+<li>服务端进行sql解析，预处理，再由优化器生成对应的执行计划</li>
+<li>mysql根据执行计划，调用存储引擎的API来执行查询</li>
+<li>将结果返回给客户端</li>
+</ol>
+<p>mysql客户端和服务器之间是半双工的，任何时刻，要么由服务器在向客户端发送数据，要么反之，不能同时发生。</p>
+<p>count是一个特殊的函数，统计某个列值的数量或统计行数，统计列值时不统计null</p>
+<p>优化limit分页，限制分页的数量；尽可能使用索引覆盖扫描，而不是查询所有的列，然后根据需要做一次关联再返回所需的列；有时候可以将limit查询转换为已知位置的查询；更好的设计时将具体的页数换成下一页按钮</p>
+<p>mysql通过创建并填充临时表来进行union查询。除非确实需要服务器消除重复的行，否则union查询最好使用union all, 没有all, 会对整个临时表的数据做唯一性检查，代价非常高。</p>
+<p>分区最大的优点是优化器可以根据分区函数来过滤一些分区，从而查询扫描更少的数据</p>
+<p>视图，是一个虚拟表 todo 更多了解</p>
+<p>innodb是mysql中唯一支持外键的内置存储引擎。某些场景，想确保两个相关表始终有一致的数据，外键约束使得查询需要额外访问别的表</p>
+<p>触发器，在insert，update或者delete时，执行一些特定的操作，可以指定在执行前还是执行后触发</p>
+<p>查询缓存系统会跟踪查询中涉及到的每个表，如果这些表发生变化，那么和这个表相关的缓存数据都将失效。 效率低 实现简单 代价小</p>
+<p>第八章，服务器配置，第九章，操作系统和硬件优化 略过</p>
+<p>一些释疑：<br>join的分类：<br>left join： 返回左表中所有的记录以及右表连接字段相等的记录；<br>right join，与left join 相反<br>inner join，内连接，或缩写为join，只返回两个表中连接字段相等的行<br>full join: 外连接，left join + right join</p>
+<p>on 和 where<br>数据可在连接表时，会生成一张中间的临时表，然后将临时表返回给用户。使用on时是生成临时表的条件，生成的临时表已经是on条件过滤的结果；where是对生成的临时表的结果再进行过滤。因此一般on比where的查询效率要高。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/mysql/" rel="tag"># mysql</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/02/09/想看的书/" rel="next" title="想看的书">
+                <i class="fa fa-chevron-left"></i> 想看的书
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/04/25/0425todo/" rel="prev" title="0425 todo">
+                0425 todo <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">along</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">49</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#高性能mysql-笔记"><span class="nav-number">1.</span> <span class="nav-text">高性能mysql 笔记</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#多版本并发控制"><span class="nav-number">2.</span> <span class="nav-text">多版本并发控制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#在线约会网站的例子-索引案例学习"><span class="nav-number">3.</span> <span class="nav-text">在线约会网站的例子 索引案例学习</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#查询性能优化"><span class="nav-number">4.</span> <span class="nav-text">查询性能优化</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">along</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

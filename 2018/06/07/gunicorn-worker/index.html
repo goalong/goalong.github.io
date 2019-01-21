@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="前面分析了Gunicorn主进程的实现，现在来看worker部分的实现，这里主要是看Sync Worker。 首先来看一下worker进程的创建： def spawn_worker(self):     self.worker_age += 1     worker = self.worker_class(self.worker_age, self.pid, self.LISTENERS,">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Gunicorn源码阅读三：Worker">
+<meta property="og:url" content="http://goalong.github.io/2018/06/07/gunicorn-worker/index.html">
+<meta property="og:site_name" content="along&#39;s space">
+<meta property="og:description" content="前面分析了Gunicorn主进程的实现，现在来看worker部分的实现，这里主要是看Sync Worker。 首先来看一下worker进程的创建： def spawn_worker(self):     self.worker_age += 1     worker = self.worker_class(self.worker_age, self.pid, self.LISTENERS,">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-01-21T08:44:46.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Gunicorn源码阅读三：Worker">
+<meta name="twitter:description" content="前面分析了Gunicorn主进程的实现，现在来看worker部分的实现，这里主要是看Sync Worker。 首先来看一下worker进程的创建： def spawn_worker(self):     self.worker_age += 1     worker = self.worker_class(self.worker_age, self.pid, self.LISTENERS,">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://goalong.github.io/2018/06/07/gunicorn-worker/">
+
+
+
+
+
+  <title>Gunicorn源码阅读三：Worker | along's space</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">along's space</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://goalong.github.io/2018/06/07/gunicorn-worker/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="along">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="along's space">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Gunicorn源码阅读三：Worker</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-07T00:00:00+08:00">
+                2018-06-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>前面分析了Gunicorn主进程的实现，现在来看worker部分的实现，这里主要是看Sync Worker。</p>
+<p>首先来看一下worker进程的创建：</p>
+<pre><code>def spawn_worker(self):
+    self.worker_age += 1
+    worker = self.worker_class(self.worker_age, self.pid, self.LISTENERS,
+                               self.app, self.timeout / 2.0,
+                               self.cfg, self.log)
+    self.cfg.pre_fork(self, worker)
+    pid = os.fork()  # 这一句会分别在master进程和子进程中执行，子进程返回的pid=0
+    if pid != 0: # 主进程执行，直接记录到self.WORKERS并返回
+        worker.pid = pid
+        self.WORKERS[pid] = worker
+        return pid
+
+    # Do not inherit the temporary files of other workers
+    for sibling in self.WORKERS.values():
+        sibling.tmp.close()
+
+    # Process Child 子进程执行
+    worker.pid = os.getpid()
+    try:
+        util._setproctitle(&quot;worker [%s]&quot; % self.proc_name)
+        self.log.info(&quot;Booting worker with pid: %s&quot;, worker.pid)
+        self.cfg.post_fork(self, worker)
+        worker.init_process()
+        sys.exit(0)
+</code></pre><p>master进程fork出子进程，可以看到在执行fork之前和之后会有pre_fork和post_fork调用，这算是Gunicorn提供的勾子，用来在fork之前和之后进行一些自定义的操作。fork之后， master进程将子进程的 pid记录到self.WORKERS然后就返回了。结下来的代码是子进程才会执行，重要的一句是worker.init_process(), 这一句开始了worker的真正工作，随后的代码都在workers目录下。</p>
+<p>在看SyncWorker之前应该先看一下workers.base.Worker这个worker的基类，包括一下几个方法：</p>
+<p>notify： 需要子类自己实现，用来向master进程每隔一段时间表明自己还活着，不然会被master进程给干掉</p>
+<p>handle_xxx： 实际的信号处理方法</p>
+<p>init_signals:  注册信号处理方法</p>
+<p>run: 子类实现，</p>
+<p>load_wsgi：导入wsgi application, 保存为属性self.wsgi</p>
+<p>init_process: 在Arbiter中调用，可以算是worker的入口，会在这里调用init_signals和run方法</p>
+<h3 id="init-process"><a href="#init-process" class="headerlink" title="init_process"></a>init_process</h3><p>下面重点看一下init_process方法：</p>
+<pre><code>def init_process(self):
+    &quot;&quot;&quot;\
+    If you override this method in a subclass, the last statement
+    in the function should be to call this method with
+    super(MyWorkerClass, self).init_process() so that the ``run()``
+    loop is initiated.
+    &quot;&quot;&quot;
+
+    # set environment&apos; variables
+    if self.cfg.env:
+        for k, v in self.cfg.env.items():
+            os.environ[k] = v
+
+    util.set_owner_process(self.cfg.uid, self.cfg.gid,
+                           initgroups=self.cfg.initgroups)
+
+    # Reseed the random number generator
+    util.seed()
+
+    # For waking ourselves up
+    self.PIPE = os.pipe()
+    for p in self.PIPE:
+        util.set_non_blocking(p)
+        util.close_on_exec(p)
+
+    # Prevent fd inheritance
+    for s in self.sockets:
+        util.close_on_exec(s)
+    util.close_on_exec(self.tmp.fileno())
+     # 需要监测的文件描述符，socket以及管道
+    self.wait_fds = self.sockets + [self.PIPE[0]]
+
+    self.log.close_on_exec()
+
+    self.init_signals() # 注册信号事件的处理方法
+
+    # start the reloader
+    if self.cfg.reload:
+        def changed(fname):
+            self.log.info(&quot;Worker reloading: %s modified&quot;, fname)
+            self.alive = False
+            self.cfg.worker_int(self)
+            time.sleep(0.1)
+            sys.exit(0)
+
+        reloader_cls = reloader_engines[self.cfg.reload_engine]
+        self.reloader = reloader_cls(extra_files=self.cfg.reload_extra_files,
+                                     callback=changed)
+        self.reloader.start()
+
+    self.load_wsgi()  # 导入wsgi应用
+    self.cfg.post_worker_init(self)
+
+    # Enter main run loop
+    self.booted = True
+    self.run() 
+</code></pre><p>init_process所作的主要工作有：</p>
+<ol>
+<li>如果有环境变量，设置环境变量</li>
+<li>注册信号处理方法</li>
+<li>导入wsgi应用</li>
+<li>调用run方法</li>
+</ol>
+<p>然后来看run方法</p>
+<h3 id="run"><a href="#run" class="headerlink" title="run"></a>run</h3><pre><code>def run(self):
+    # if no timeout is given the worker will never wait and will
+    # use the CPU for nothing. This minimal timeout prevent it.
+    timeout = self.timeout or 0.5
+
+    # self.socket appears to lose its blocking status after
+    # we fork in the arbiter. Reset it here.
+    for s in self.sockets:
+        s.setblocking(0)
+
+    if len(self.sockets) &gt; 1:
+        self.run_for_multiple(timeout)
+    else:
+        self.run_for_one(timeout)
+</code></pre><p>基本上就是判断监听地址的数量，选择是调用run_for_one还是run_for_multiple.</p>
+<p>无论是run_for_one还是run_for_multiple，本质上都是会有一个while循环不停调用self.accept, self.accept再调用self.handle, self.handle调用self.handle_request.</p>
+<p>下面看一下handle_request</p>
+<h3 id="handle-request"><a href="#handle-request" class="headerlink" title="handle_request"></a>handle_request</h3><pre><code>def handle_request(self, listener, req, client, addr):
+    environ = {}
+    resp = None
+    try:
+        self.cfg.pre_request(self, req)
+        request_start = datetime.now()
+        resp, environ = wsgi.create(req, client, addr,
+                listener.getsockname(), self.cfg)
+        # Force the connection closed until someone shows
+        # a buffering proxy that supports Keep-Alive to
+        # the backend.
+        resp.force_close()
+        self.nr += 1
+        if self.nr &gt;= self.max_requests:
+            self.log.info(&quot;Autorestarting worker after current request.&quot;)
+            self.alive = False
+        respiter = self.wsgi(environ, resp.start_response)  # 这一句调用wsgi app来根据请求生成响应内容， 一般的web框架如Django, flask就是这时候被调用的
+        try:
+            if isinstance(respiter, environ[&apos;wsgi.file_wrapper&apos;]):
+                resp.write_file(respiter)
+            else:
+                for item in respiter:
+                    resp.write(item)
+            resp.close()
+            request_time = datetime.now() - request_start
+            self.log.access(resp, req, environ, request_time)
+</code></pre><p>resp, environ = wsgi.create(req, client, addr,<br>                listener.getsockname(), self.cfg) 这一句构造了Response对象以及环境变量environ, 然后调用self.wsgi(environ, resp.start_response) 来将请求交给wsgi application来处理, 常见的开发中使用web框架如Django, flask等，这里就是web框架开始接手的地方，wsgi application是一个可调用的对象（如函数，类等，有<strong>call</strong>方法), 接收environ和start_response两个参数。</p>
+<p>下面是一个极简的wsgi application：</p>
+<pre><code>def app(environ, start_response):
+    &quot;&quot;&quot;Simplest possible application object&quot;&quot;&quot;
+
+    data = b&apos;Hello, World!\n&apos;
+    status = &apos;200 OK&apos;
+
+    response_headers = [
+        (&apos;Content-type&apos;, &apos;text/plain&apos;),
+        (&apos;Content-Length&apos;, str(len(data))),
+        (&apos;X-Gunicorn-Version&apos;, __version__),
+        #(&quot;Test&quot;, &quot;test тест&quot;),
+    ]
+    start_response(status, response_headers)
+    return iter([data])
+</code></pre><p>wsgi application通过environ这个字典里面的环境信息，例如请求的地址，方法，参数等，来构造响应的内容，然后调用start_response这个回调函数来将http状态码和头部返回给server，最后返回一个可迭代对象，内容是响应的正文。</p>
+<p>最后总结一下worker的工作流程：</p>
+<ol>
+<li>主进程fork出worker进程，并调用init_process</li>
+<li>init_process处理环境变量，导入wsgi app, 以及注册信号事件，最后调用run</li>
+<li>run根据监听的socket的数量选择调用run_for_one或者run_for_multiple，而它们则都是调用accept来监听socket</li>
+<li>如果有请求到达，会交给 handle处理，handle调用handle_request, handle_request调用wsgi app来处理请求，wsgi app根据请求生成响应并返回给worker，然后worker将响应发送给客户端。</li>
+</ol>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/06/02/gunicorn arbiter/" rel="next" title="Gunicorn源码阅读二：Arbiter大魔王">
+                <i class="fa fa-chevron-left"></i> Gunicorn源码阅读二：Arbiter大魔王
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/06/09/WSGI简介/" rel="prev" title="WSGI简介">
+                WSGI简介 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">along</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">49</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#init-process"><span class="nav-number">1.</span> <span class="nav-text">init_process</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#run"><span class="nav-number">2.</span> <span class="nav-text">run</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#handle-request"><span class="nav-number">3.</span> <span class="nav-text">handle_request</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">along</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
