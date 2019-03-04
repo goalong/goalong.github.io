@@ -1,9 +1,9 @@
 ---
 title: about
-date: 2018-03-07 10:37:15
+date: 2019-03-04 10:37:15
 ---
 
-一个目前写Python的程序员，base北京，在这里记录和分享工作和生活中的点滴，努力做一个不断进击的人。
+一个目前写Python的程序员，现居北京，爱好跑步、越野、篮球，在这里记录和分享工作和生活中的点滴，努力做一个不断进击的人。
 
 之所以写博客一来因为好记性不如烂笔头，二来通过写作可以更好的在脑海中对知识进行组织和整理，然后输出，加强记忆和理解.
 
@@ -20,6 +20,8 @@ I do and I understand.
 如果能帮助到别人，那就更好不过了，也欢迎大家和我交流。
 
 Email: goforalong@gmail.com
+
+Github: [https://github.com/goalong](https://github.com/goalong)
 
 WX: 
 
