@@ -23,7 +23,7 @@ Email: goforalong@gmail.com
 
 Github: [https://github.com/goalong](https://github.com/goalong)
 
-WX: 
+Wechat: 
 
 ![wx](https://s15.postimg.cc/fewpxgdvv/CEC40_FA03_A30_A68136611_F0_E6_B5_FD823.jpg)
 
