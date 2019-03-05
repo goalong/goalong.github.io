@@ -19,6 +19,12 @@ I do and I understand.
 
 如果能帮助到别人，那就更好不过了，也欢迎大家和我交流。
 
+一些项目：
+
+[一个使用Python/Flask的社区网站](http://www.3wanli.com/), 项目地址：[https://github.com/goalong/flask-demo](https://github.com/goalong/flask-demo)
+
+[leetcode Python/Golang 解题报告](https://github.com/goalong/lc)
+
 Email: goforalong@gmail.com
 
 Github: [https://github.com/goalong](https://github.com/goalong)
