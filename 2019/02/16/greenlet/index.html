@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="简介greenlet, 是一种微型线程，也叫协程，许多的greenlet之间的跳转需要显式的指定。基于生成器的协程在进行协程之间的切换时只能由当前的协程切换到其调用者，而greenlet提供的切换允许你切换到指定的协程。 12345678910111213141516from greenlet import greenletdef test1():    print(12)    gr2.swit">
+<meta name="description" content="简介greenlet, 是一种微型线程，也叫协程。基于生成器的协程在进行协程之间的切换时只能由当前的协程切换到其调用者，而greenlet提供的切换允许你切换到指定的协程。12345678910111213141516from greenlet import greenletdef test1():    print(12)    gr2.switch()    print(34)def test">
 <meta name="keywords" content="Python">
 <meta property="og:type" content="article">
 <meta property="og:title" content="greenlet笔记">
-<meta property="og:url" content="http://goalong.github.io/2019/03/02/greenlet/index.html">
+<meta property="og:url" content="http://goalong.github.io/2019/02/16/greenlet/index.html">
 <meta property="og:site_name" content="along&#39;s space">
-<meta property="og:description" content="简介greenlet, 是一种微型线程，也叫协程，许多的greenlet之间的跳转需要显式的指定。基于生成器的协程在进行协程之间的切换时只能由当前的协程切换到其调用者，而greenlet提供的切换允许你切换到指定的协程。 12345678910111213141516from greenlet import greenletdef test1():    print(12)    gr2.swit">
+<meta property="og:description" content="简介greenlet, 是一种微型线程，也叫协程。基于生成器的协程在进行协程之间的切换时只能由当前的协程切换到其调用者，而greenlet提供的切换允许你切换到指定的协程。12345678910111213141516from greenlet import greenletdef test1():    print(12)    gr2.switch()    print(34)def test">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-03-08T08:56:45.000Z">
+<meta property="og:updated_time" content="2019-03-11T05:57:04.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="greenlet笔记">
-<meta name="twitter:description" content="简介greenlet, 是一种微型线程，也叫协程，许多的greenlet之间的跳转需要显式的指定。基于生成器的协程在进行协程之间的切换时只能由当前的协程切换到其调用者，而greenlet提供的切换允许你切换到指定的协程。 12345678910111213141516from greenlet import greenletdef test1():    print(12)    gr2.swit">
+<meta name="twitter:description" content="简介greenlet, 是一种微型线程，也叫协程。基于生成器的协程在进行协程之间的切换时只能由当前的协程切换到其调用者，而greenlet提供的切换允许你切换到指定的协程。12345678910111213141516from greenlet import greenletdef test1():    print(12)    gr2.switch()    print(34)def test">
 
 
 
@@ -120,7 +120,7 @@
 
 
 
-  <link rel="canonical" href="http://goalong.github.io/2019/03/02/greenlet/">
+  <link rel="canonical" href="http://goalong.github.io/2019/02/16/greenlet/">
 
 
 
@@ -253,7 +253,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://goalong.github.io/2019/03/02/greenlet/">
+    <link itemprop="mainEntityOfPage" href="http://goalong.github.io/2019/02/16/greenlet/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="along">
@@ -282,8 +282,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-03-02T00:00:00+08:00">
-                2019-03-02
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-02-16T00:00:00+08:00">
+                2019-02-16
               </time>
             
 
@@ -320,8 +320,7 @@
       
 
       
-        <h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>greenlet, 是一种微型线程，也叫协程，许多的greenlet之间的跳转需要显式的指定。基于生成器的协程在进行协程之间的切换时只能由当前的协程切换到其调用者，而greenlet提供的切换允许你切换到指定的协程。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">from greenlet import greenlet</span><br><span class="line"></span><br><span class="line">def test1():</span><br><span class="line">    print(12)</span><br><span class="line">    gr2.switch()</span><br><span class="line">    print(34)</span><br><span class="line"></span><br><span class="line">def test2():</span><br><span class="line">    print(56)</span><br><span class="line">    gr1.switch()</span><br><span class="line">    print(78)</span><br><span class="line"></span><br><span class="line">gr1 = greenlet(test1)</span><br><span class="line">gr2 = greenlet(test2)</span><br><span class="line">gr1.switch()</span><br><span class="line">print(&quot;finish&quot;)</span><br></pre></td></tr></table></figure>
+        <h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>greenlet, 是一种微型线程，也叫协程。基于生成器的协程在进行协程之间的切换时只能由当前的协程切换到其调用者，而greenlet提供的切换允许你切换到指定的协程。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">from greenlet import greenlet</span><br><span class="line"></span><br><span class="line">def test1():</span><br><span class="line">    print(12)</span><br><span class="line">    gr2.switch()</span><br><span class="line">    print(34)</span><br><span class="line"></span><br><span class="line">def test2():</span><br><span class="line">    print(56)</span><br><span class="line">    gr1.switch()</span><br><span class="line">    print(78)</span><br><span class="line"></span><br><span class="line">gr1 = greenlet(test1)</span><br><span class="line">gr2 = greenlet(test2)</span><br><span class="line">gr1.switch()</span><br><span class="line">print(&quot;finish&quot;)</span><br></pre></td></tr></table></figure></p>
 <p>使用greenlet(func)创建一个greenlet, 最后一行gr1.switch()将程序切换到test1函数进行执行，输出12，然后gr2.switch()切换到test2运行，test1此时被暂停，test2输出56，接着test2中又调用了gr1.switch()，这样回到刚才暂停的test1继续执行，输出34，然后test1执行完毕，gr1也就死亡了，这时执行回到最初的gr1.switch(),输出finish，全部执行完毕，进程结束。注意test2的78是不会被输出的。</p>
 <h3 id="parents"><a href="#parents" class="headerlink" title="parents"></a>parents</h3><p>一个greenlet的执行结束了就被称为死亡（dead)了，遇到未能捕捉的异常也会导致greenlet的死亡。greenlet死亡之后程序往哪执行呢？答案是它的parent greenlet。每个greenlet都有一个parent greenlet，默认是该greenlet的创建者。greenlet死亡之后会切换到其parent greenlet继续执行。可以说greenlet的组织类似一棵树，最外层的不是在greenlet中创建的greenlet, 它的parent默认是main greenlet, 也就是树的根。</p>
 <p>上面的例子中，gr1和gr2的parent都是main greenlet，其中一个死了，执行就会回到main greenlet。未捕获的异常也会展开至parent greenlet。</p>
@@ -386,8 +385,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2019/02/28/Python装饰器/" rel="next" title="Python装饰器总结">
-                <i class="fa fa-chevron-left"></i> Python装饰器总结
+              <a href="/2019/01/21/Python中的字符编码总结/" rel="next" title="Python中的字符编码总结">
+                <i class="fa fa-chevron-left"></i> Python中的字符编码总结
               </a>
             
           </div>
@@ -396,8 +395,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2019/03/02/go读书笔记总结/" rel="prev" title="Go读书笔记总结">
-                Go读书笔记总结 <i class="fa fa-chevron-right"></i>
+              <a href="/2019/02/18/python asynchronous/" rel="prev" title="Python异步之旅">
+                Python异步之旅 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -475,7 +474,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">52</span>
+                  <span class="site-state-item-count">55</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

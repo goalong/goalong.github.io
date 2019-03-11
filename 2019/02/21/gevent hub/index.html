@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="gevent,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="hub是gevent中非常重要的一部分，但是在官方文档对它的描述中，除了宏观的描述了一下是一个事件循环外，就没怎么具体的说了，关于它的目的、它是什么以及它如何工作的都没怎么叙述。这篇文章就是为了改变这个现状以及回答如下的一些问题：  hub是什么 hub是如何运行事件循环的 greenlet是如何进行IO的？如何一边运行着事件循环，一边又运行着其他的greenlet，并且在他们阻塞的时候选择一个正">
+<meta name="keywords" content="gevent">
+<meta property="og:type" content="article">
+<meta property="og:title" content="gevent的hub">
+<meta property="og:url" content="http://goalong.github.io/2019/02/21/gevent hub/index.html">
+<meta property="og:site_name" content="along&#39;s space">
+<meta property="og:description" content="hub是gevent中非常重要的一部分，但是在官方文档对它的描述中，除了宏观的描述了一下是一个事件循环外，就没怎么具体的说了，关于它的目的、它是什么以及它如何工作的都没怎么叙述。这篇文章就是为了改变这个现状以及回答如下的一些问题：  hub是什么 hub是如何运行事件循环的 greenlet是如何进行IO的？如何一边运行着事件循环，一边又运行着其他的greenlet，并且在他们阻塞的时候选择一个正">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://i.loli.net/2019/03/10/5c84fa87e414a.png">
+<meta property="og:updated_time" content="2019-03-11T05:57:31.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="gevent的hub">
+<meta name="twitter:description" content="hub是gevent中非常重要的一部分，但是在官方文档对它的描述中，除了宏观的描述了一下是一个事件循环外，就没怎么具体的说了，关于它的目的、它是什么以及它如何工作的都没怎么叙述。这篇文章就是为了改变这个现状以及回答如下的一些问题：  hub是什么 hub是如何运行事件循环的 greenlet是如何进行IO的？如何一边运行着事件循环，一边又运行着其他的greenlet，并且在他们阻塞的时候选择一个正">
+<meta name="twitter:image" content="https://i.loli.net/2019/03/10/5c84fa87e414a.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://goalong.github.io/2019/02/21/gevent hub/">
+
+
+
+
+
+  <title>gevent的hub | along's space</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">along's space</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://goalong.github.io/2019/02/21/gevent hub/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="along">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="along's space">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">gevent的hub</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-02-21T00:00:00+08:00">
+                2019-02-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>hub是gevent中非常重要的一部分，但是在官方文档对它的描述中，除了宏观的描述了一下是一个事件循环外，就没怎么具体的说了，关于它的目的、它是什么以及它如何工作的都没怎么叙述。这篇文章就是为了改变这个现状以及回答如下的一些问题：</p>
+<ul>
+<li>hub是什么</li>
+<li>hub是如何运行事件循环的</li>
+<li>greenlet是如何进行IO的？如何一边运行着事件循环，一边又运行着其他的greenlet，并且在他们阻塞的时候选择一个正确的greenlet去执行的？</li>
+</ul>
+<h3 id="hub是什么"><a href="#hub是什么" class="headerlink" title="hub是什么"></a>hub是什么</h3><p>先从官方文档上的描述说起吧：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">当gevent API中的一个函数A要阻塞的时候，它将获得一个gevent.hub.Hub的实例（Hub实</span><br><span class="line">例是一个非常特别的运行着事件循环的greenlet），然后函数A的那个greenlet被切换到</span><br><span class="line">Hub(将控制权交还给Hub）。如果当时还没有gevent.hub.Hub实例，就会自动创建一个。</span><br></pre></td></tr></table></figure>
+<p>这个描述好像还是不够清晰，API文档中对hub确实也没怎么细说。</p>
+<p>为了弄明白这到底什么意思, 咱们分成几小块细细说来。</p>
+<h3 id="hub其实是一个greenlet"><a href="#hub其实是一个greenlet" class="headerlink" title="hub其实是一个greenlet"></a>hub其实是一个greenlet</h3><p>首先，hub本身也是一个greenlet。greenlet是绿色线程的一个实现。他们看起来像一个常规的操作系统级别的线程，每个greenlet都有一个调用栈（Python解释器的C调用栈加上Python调用栈), 而且也代表着程序中的一段控制流。不同之处在于多个greenlet可以共存在一个线程中，但是任意时刻一个线程中只有一个greenlet在运行。</p>
+<p>另一个greenlet与操作系统线程不同的地方在于它们是协作式调度的，而不是抢占式调度。这意味着为了让另一个greenlet运行，当前运行的greenlet必须放弃控制权，这叫做切换。而且，切换时必须明确选择要让哪个greenlet来接替执行。需要在当前的greenlet里调用目的地greenlet的switch方法来进行这样的切换。当切换发生时，当前greenlet的调用栈会被保存下来，目的地greenlet的调用栈被放到正确的位置，然后执行流在目的地greenlet上次切换的地方继续执行。</p>
+<h3 id="hub运行着事件循环"><a href="#hub运行着事件循环" class="headerlink" title="hub运行着事件循环"></a>hub运行着事件循环</h3><p>好的，现在我们知道了hub是一个greenlet，是一种协作式调度的调用栈或者说执行线程，而且这个执行线程运行着事件循环。</p>
+<p>下面是gevent文档里对事件循环的描述：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">gevent让操作系统传发出事件让事件循环知道何时一个事件发生了，例如数据已经传输过来了</span><br><span class="line">socket可以读了，从而代替阻塞和一直等待socket操作完成（轮询）的方式。通过这样做，</span><br><span class="line">gevent可以继续运行下一个或许已经有事件就绪的greenlet。这样重复的注册事件以及在事件</span><br><span class="line">发生时进行处理的流程就是事件循环了。</span><br></pre></td></tr></table></figure>
+<p>用图来表示的话，一个事件循环就像下面这样（这是个libuv事件循环比较宏观的概览，不要在意具体的细节和技术）：</p>
+<p><img src="https://i.loli.net/2019/03/10/5c84fa87e414a.png" alt="loop_iteration.png"></p>
+<p>运行事件循环意味着hub从那个循环的顶部开始进入，然后开始一圈圈的无限循环。gevent支持的事件循环是由C实现的，因此从循环的顶部进入意味着进行一个C的函数调用，那个C函数调用是不会返回的（因为是一个无限循环）。</p>
+<p>注册事件是由叫做watchers的对象完成的。每个watcher对象等待着一个事件的发生。</p>
+<p>但是其他的实际进行读写socket的greenlet是如何开始运行的呢？真正有趣的地方开始了。</p>
+<h3 id="冲出hub"><a href="#冲出hub" class="headerlink" title="冲出hub"></a>冲出hub</h3><p>再看一下上面的图示，注意以Call开头的，例如”Call pending callbacks”，以及以Run开头的，例如”Run due timers”，这些部分正是仍然在C函数中的事件循环给gevent机会去执行一些例如处理IO事件或者处理预先注册的事件（timer)的时候。</p>
+<p>gevent对于每一个它咬处理的事件都创建了watcher然后把watcher交给事件循环。每个watcher都有一个回调函数，当预期的事件发生时事件循环会调用这个回调函数。（把watcher交给事件循环并且给它绑定一个回调函数被称为开始一个watcher). 回调函数几乎什么都能做。如果恰好回调函数里调用了g.switch(), 呜呼，突然之间，hub以及正在运行的事件循环被暂停了（C调用栈也被保存了），然后某个其他的greenlet开始接替进行执行。</p>
+<h3 id="我们是如何第一次进入hub的"><a href="#我们是如何第一次进入hub的" class="headerlink" title="我们是如何第一次进入hub的"></a>我们是如何第一次进入hub的</h3><p>我们刚看到了执行流如何离开正在热火朝天的运行着事件循环的hub的：某个回调函数里面调用了greenlet.switch方法。但是我们最开始的时候又是怎么在hub里运行事件循环的呢？</p>
+<p>我们再回头看一下文档对hub的描述：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">当gevent API中的一个函数A要阻塞的时候，它将获得一个gevent.hub.Hub的实例（Hub实</span><br><span class="line">例是一个非常特别的运行着事件循环的greenlet），然后函数A的那个greenlet被切换到</span><br><span class="line">Hub(将控制权交还给Hub）。如果当时还没有gevent.hub.Hub实例，就会自动创建一个。</span><br></pre></td></tr></table></figure>
+<p>所以gevent中任何会阻塞的函数（例如gevent.socket.socket.read()）都会将执行切换到hub。如果是第一次切换到hub里，hub就会启动事件循环，否则，如果hub已经在运行着事件循环了，就会从上次离开的地方开始然后对下一个事件（IO, timer）通过回调函数进行处理，如果没有事件就继续等待下一个事件发生。</p>
+<p>你可以想象成一个乒乓球一样的场景，hub在桌子的一边，其他所有的greenlet在另一边。hub通过网络将球打到对面的greenlet，greenlet再把球打回来，然后hub把球打过去给另一个greenlet，就这样无限循环。</p>
+<h3 id="写点代码"><a href="#写点代码" class="headerlink" title="写点代码"></a>写点代码</h3><p>现在我们拥有了一些背景知识，可以写一些代码看看它们是如何组合在一起工作的了。</p>
+<p>gevent大多数的阻塞的函数都会在它们的实现里调用Hub.wait().下面是gevent.socket.socket.recv()大致的流程：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">def recv(self, *args):</span><br><span class="line">    while True:</span><br><span class="line">        try:</span><br><span class="line">            return _socket.socket.recv(self._sock, *args)</span><br><span class="line">        except error as ex:</span><br><span class="line">            if ex.args[0] != EWOULDBLOCK:</span><br><span class="line">                raise</span><br><span class="line">        self.hub.wait(self._read_event)</span><br></pre></td></tr></table></figure>
+<p>这段代码一直循环知道能读到数据。如果我们尝试读取数据，结果发现没有，就会调用hub.wait()把执行切换到事件循环，这将跳转回到hub，确保事件循环监视着这些socket, 然后继续运行。</p>
+<p>Hub.wait大致的实现是下面这样（这是简化的例子，真实情况要比这安全而且使用了<a href="http://www.gevent.org/api/gevent.hub.html#gevent.hub.Waiter" target="_blank" rel="noopener">Waiter</a>:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">def wait(self, watcher): # Hub.wait()</span><br><span class="line">    # `watcher` is an event-loop object with a callback. When the</span><br><span class="line">    # event it&apos;s waiting for happens, its callback gets called.</span><br><span class="line">    current_greenlet = getcurrent()</span><br><span class="line">    # The callback for this event will switch back to</span><br><span class="line">    # this current greenlet</span><br><span class="line">    watcher.start(current_greenlet.switch) # Ask the event loop to watch this</span><br><span class="line">    try:</span><br><span class="line">        # Start running the hub.</span><br><span class="line">        self.switch()</span><br><span class="line">        # Once we get here, it&apos;s because the watcher&apos;s callback</span><br><span class="line">        # fired and this greenlet got switched into.</span><br><span class="line">        return # Let the blocking code continue, its event is ready</span><br><span class="line">    finally:</span><br><span class="line">        watcher.stop()</span><br></pre></td></tr></table></figure>
+<h3 id="一些注意事项"><a href="#一些注意事项" class="headerlink" title="一些注意事项"></a>一些注意事项</h3><ul>
+<li><p>一个greenlet执行完成后会发生什么？<br>  控制将回到它的parent greenlet. gevent让hub作为所有它运行的gevent的parent，因此当一个parent不论是成功完成执行还是有未捕获的异常而意外终止，执行流都会回到hub，以便继续运行事件循环。</p>
+</li>
+<li><p>当我们想开始一个新的greenlet时会发生什么？<br>  gevent.spawn()创建一个新的greenlet，并且安排它在事件循环的下一轮循环时开始运行。猜想一下它是如何实现的，它创建一个事件的watcher，并且绑定一个new_greenlet.switch()的回调函数。这种事件的watcher是一个”prepare” watcher，这种类型的事件会在每一轮循环的开始就变的就绪。</p>
+</li>
+<li><p>gevent的锁和超时机制是如何实现的？<br>  你得等到下一篇文章来探讨这些主题了。</p>
+</li>
+</ul>
+<p>原文：</p>
+<p><a href="https://dev.nextthought.com/blog/2018/05/gevent-hub.html" target="_blank" rel="noopener">gevent’s hub</a></p>
+<p>注：原文的作者Jason Madden也是目前gevent库的主要维护者。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/gevent/" rel="tag"># gevent</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/02/18/python asynchronous/" rel="next" title="Python异步之旅">
+                <i class="fa fa-chevron-left"></i> Python异步之旅
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/02/28/Python装饰器/" rel="prev" title="Python装饰器总结">
+                Python装饰器总结 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">along</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">55</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#hub是什么"><span class="nav-number">1.</span> <span class="nav-text">hub是什么</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#hub其实是一个greenlet"><span class="nav-number">2.</span> <span class="nav-text">hub其实是一个greenlet</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#hub运行着事件循环"><span class="nav-number">3.</span> <span class="nav-text">hub运行着事件循环</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#冲出hub"><span class="nav-number">4.</span> <span class="nav-text">冲出hub</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#我们是如何第一次进入hub的"><span class="nav-number">5.</span> <span class="nav-text">我们是如何第一次进入hub的</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#写点代码"><span class="nav-number">6.</span> <span class="nav-text">写点代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#一些注意事项"><span class="nav-number">7.</span> <span class="nav-text">一些注意事项</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">along</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

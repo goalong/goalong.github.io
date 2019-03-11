@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Python,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="*args和**kwargs*args 和 **kwargs 主要用于函数定义。 你可以将不定数量的参数传递给一个函数. *args 是用来发送一个非键值对的可变数量的参数列表给一个函数 12345def print_args(f_arg, *argv):    print(&quot;first normal arg:&quot;, f_arg)    for arg in argv:        print(&quot;">
+<meta name="keywords" content="Python">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Python高级用法">
+<meta property="og:url" content="http://goalong.github.io/2019/03/01/Python进阶/index.html">
+<meta property="og:site_name" content="along&#39;s space">
+<meta property="og:description" content="*args和**kwargs*args 和 **kwargs 主要用于函数定义。 你可以将不定数量的参数传递给一个函数. *args 是用来发送一个非键值对的可变数量的参数列表给一个函数 12345def print_args(f_arg, *argv):    print(&quot;first normal arg:&quot;, f_arg)    for arg in argv:        print(&quot;">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-03-11T06:02:21.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Python高级用法">
+<meta name="twitter:description" content="*args和**kwargs*args 和 **kwargs 主要用于函数定义。 你可以将不定数量的参数传递给一个函数. *args 是用来发送一个非键值对的可变数量的参数列表给一个函数 12345def print_args(f_arg, *argv):    print(&quot;first normal arg:&quot;, f_arg)    for arg in argv:        print(&quot;">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://goalong.github.io/2019/03/01/Python进阶/">
+
+
+
+
+
+  <title>Python高级用法 | along's space</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">along's space</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://goalong.github.io/2019/03/01/Python进阶/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="along">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="along's space">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Python高级用法</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-03-01T00:00:00+08:00">
+                2019-03-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="args和-kwargs"><a href="#args和-kwargs" class="headerlink" title="*args和**kwargs"></a>*args和**kwargs</h3><p>*args 和 **kwargs 主要用于函数定义。 你可以将不定数量的参数传递给一个函数.</p>
+<p>*args 是用来发送一个非键值对的可变数量的参数列表给一个函数</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">print_args</span><span class="params">(f_arg, *argv)</span>:</span></span><br><span class="line">    print(<span class="string">"first normal arg:"</span>, f_arg)</span><br><span class="line">    <span class="keyword">for</span> arg <span class="keyword">in</span> argv:</span><br><span class="line">        print(<span class="string">"another arg through *argv:"</span>, arg)</span><br><span class="line">print_args(<span class="string">'a'</span>, <span class="string">'b'</span>, <span class="string">'c'</span>, <span class="string">'d'</span>)</span><br></pre></td></tr></table></figure>
+<p>输出：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">first normal arg: a</span><br><span class="line">another arg through *argv: b</span><br><span class="line">another arg through *argv: c</span><br><span class="line">another arg through *argv: d</span><br></pre></td></tr></table></figure>
+<p>可以看到argv获得了b、c、d这三个传进来的参数，其实就是一个(“b”, “c”, “d”)这样的元组。</p>
+<p>**kwargs 允许你将不定长度的键值对, 作为参数传递给一个函数.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">print_kw</span><span class="params">(**kwargs)</span>:</span></span><br><span class="line">    <span class="keyword">for</span> key, value <span class="keyword">in</span> kwargs.items():</span><br><span class="line">        print(<span class="string">"&#123;0&#125; == &#123;1&#125;"</span>.format(key, value))</span><br><span class="line"></span><br><span class="line">print_kw(name=<span class="string">"jack"</span>, age=<span class="number">19</span>)</span><br></pre></td></tr></table></figure>
+<p>输出：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">name == jack</span><br><span class="line">age == 19</span><br></pre></td></tr></table></figure>
+<p>这里kwargs就是一个字典，键值对就是调用时传进来的命名参数。</p>
+<p>仍旧使用上面的两个函数，传参的时候就可以使用*args, **kwargs，注意args就是元组，kwargs就是字典。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>args = (<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print_args(*args) </span><br><span class="line">first normal arg: <span class="number">1</span></span><br><span class="line">another arg through *argv: <span class="number">2</span></span><br><span class="line">another arg through *argv: <span class="number">3</span></span><br><span class="line">&gt;&gt;&gt;kwargs = &#123;<span class="string">"name"</span>: <span class="string">"Tom"</span>, <span class="string">"age"</span>: <span class="number">20</span>&#125;</span><br><span class="line">&gt;&gt;&gt;print_kw(**kwargs)</span><br><span class="line">name == Tom</span><br><span class="line">age == <span class="number">20</span></span><br></pre></td></tr></table></figure>
+<p>注意普通参数与<em>args、**kwargs的顺序：func(fargs, </em>args, **kwargs)。<br>常见使用场景：定义装饰器时。</p>
+<h3 id="生成器"><a href="#生成器" class="headerlink" title="生成器"></a>生成器</h3><p>生成器也是迭代器，不过只能迭代一次，这是因为它们并没有把所有的值存在内存中，而是在运行时生成值。许多Python 2里的标准库函数都会返回列表，而Python 3都修改成了返回生成器，因为生成器占用更少的资源。函数返回使用yield而不是return的都是生成器函数。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">generator</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">3</span>):</span><br><span class="line">        <span class="keyword">yield</span> i</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> item <span class="keyword">in</span> generator():</span><br><span class="line">    print(item)</span><br><span class="line"></span><br><span class="line">输出： </span><br><span class="line"><span class="number">0</span></span><br><span class="line"><span class="number">1</span></span><br><span class="line"><span class="number">2</span></span><br></pre></td></tr></table></figure>
+<p>注意可迭代对象和迭代器还有一些分别，迭代器是定义了next()或<strong>next</strong>方法的对象，可迭代对象是定义了<strong>iter</strong>或者<strong>getitem</strong>方法的对象。例如字符串是一个可迭代对象，但不是迭代器。</p>
+<h3 id="map-filter-reduce"><a href="#map-filter-reduce" class="headerlink" title="map filter reduce"></a>map filter reduce</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt;items = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]</span><br><span class="line">&gt;&gt;&gt;squared = list(map(<span class="keyword">lambda</span> x: x**<span class="number">2</span>, items)) //map在python2返回列表，python3返回生成器</span><br><span class="line">&gt;&gt;&gt;print(squared)</span><br><span class="line"><span class="number">1</span></span><br><span class="line"><span class="number">4</span></span><br><span class="line"><span class="number">9</span></span><br><span class="line"></span><br><span class="line">&gt;&gt;&gt;number_list = range(<span class="number">-5</span>, <span class="number">5</span>)</span><br><span class="line">&gt;&gt;&gt;less_than_zero = filter(<span class="keyword">lambda</span> x: x &lt; <span class="number">0</span>, number_list)</span><br><span class="line">&gt;&gt;&gt;print(list(less_than_zero)) </span><br><span class="line">[<span class="number">-5</span>, <span class="number">-4</span>, <span class="number">-3</span>, <span class="number">-2</span>, <span class="number">-1</span>]</span><br><span class="line"></span><br><span class="line">&gt;&gt;&gt;<span class="keyword">from</span> functools <span class="keyword">import</span> reduce</span><br><span class="line">&gt;&gt;&gt;product = reduce( (<span class="keyword">lambda</span> x, y: x * y), [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>] )</span><br><span class="line">&gt;&gt;&gt;print(product)</span><br><span class="line"><span class="number">24</span></span><br></pre></td></tr></table></figure>
+<h3 id="可变与不可变"><a href="#可变与不可变" class="headerlink" title="可变与不可变"></a>可变与不可变</h3><p>可变对象： list、dict、set<br>不可变对象：tuple, str, </p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">foo = [<span class="string">'hi'</span>]</span><br><span class="line">print(foo)</span><br><span class="line"><span class="comment"># Output: ['hi']</span></span><br><span class="line"></span><br><span class="line">bar = foo</span><br><span class="line">bar += [<span class="string">'bye'</span>]</span><br><span class="line">print(foo)</span><br><span class="line"><span class="comment"># Output: ['hi', 'bye']</span></span><br></pre></td></tr></table></figure>
+<p>每当你将一个变量赋值为另一个可变类型的变量时，对这个数据的任意改动会同时反映到这两个变量上去，新变量只不过是老变量的一个别名而已。</p>
+<h3 id="slots-魔法"><a href="#slots-魔法" class="headerlink" title="slots 魔法"></a><strong>slots</strong> 魔法</h3><p>在Python中，定义类的时候定义其属性和方法，实例创建之后仍可动态为其添加属性和方法，这样很方便但也占用大量内存。使用<strong>slots</strong>可以限定允许绑定的属性，就只能是<strong>slots</strong>中指定的那些属性。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point</span><span class="params">(object)</span>:</span>    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, x=<span class="number">0</span>, y=<span class="number">0</span>)</span>:</span></span><br><span class="line">        self.x = x</span><br><span class="line">        self.y = y</span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>p = Point(<span class="number">3</span>, <span class="number">4</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>p.z = <span class="number">5</span>    <span class="comment"># 绑定了一个新的属性</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>p.z</span><br><span class="line"><span class="number">5</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Point</span><span class="params">(object)</span>:</span></span><br><span class="line">    __slots__ = (<span class="string">'x'</span>, <span class="string">'y'</span>)       <span class="comment"># 只允许使用 x 和 y</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, x=<span class="number">0</span>, y=<span class="number">0</span>)</span>:</span></span><br><span class="line">        self.x = x</span><br><span class="line">        self.y = y</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>p = Point(<span class="number">3</span>, <span class="number">4</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>p.z = <span class="number">5</span></span><br><span class="line">---------------------------------------------------------------------------</span><br><span class="line">AttributeError                            Traceback (most recent call last)</span><br><span class="line">&lt;ipython-input<span class="number">-648</span><span class="number">-625</span>ed954d865&gt; <span class="keyword">in</span> &lt;module&gt;()</span><br><span class="line">----&gt; 1 p.z = 5</span><br><span class="line"></span><br><span class="line">AttributeError: <span class="string">'Point'</span> object has no attribute <span class="string">'z'</span></span><br></pre></td></tr></table></figure>
+<p>注意<strong>slots</strong> 设置的属性仅对当前类有效，对继承的子类不起效，除非子类也定义了 slots，这样，子类允许定义的属性就是自身的 slots 加上父类的 slots.</p>
+<h3 id="协程"><a href="#协程" class="headerlink" title="协程"></a>协程</h3><p>用户态的轻量级线程，线程和进程都是操作系统进行调度的，协程是用户程序自己调度的，可以暂时中断，之后再继续执行的程序，不需要陷入内核态，适用于 IO 密集型任务</p>
+<p>协程的本质就是在单线程下，由用户自己控制一个任务遇到io阻塞了就切换另外一个任务去执行，以此来提升效率</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">coro</span><span class="params">()</span>:</span></span><br><span class="line">	value = <span class="number">0</span></span><br><span class="line">	<span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">    	receive = <span class="keyword">yield</span> value</span><br><span class="line">    	<span class="keyword">if</span> receive == <span class="number">100</span>:</span><br><span class="line">          <span class="keyword">break</span></span><br><span class="line">    	value = receive</span><br><span class="line">    </span><br><span class="line">&gt;&gt;&gt;a = coro()</span><br><span class="line">&gt;&gt;&gt;a.send(<span class="keyword">None</span>)</span><br><span class="line"><span class="number">0</span></span><br><span class="line">&gt;&gt;&gt;a.send(<span class="number">8</span>)</span><br><span class="line"><span class="number">8</span></span><br><span class="line">&gt;&gt;&gt;a.send(<span class="number">9</span>)</span><br><span class="line"><span class="number">9</span></span><br><span class="line">&gt;&gt;&gt;a.send(<span class="number">100</span>)</span><br><span class="line">Traceback (most recent call last):</span><br><span class="line">  File <span class="string">"&lt;input&gt;"</span>, line <span class="number">1</span>, <span class="keyword">in</span> &lt;module&gt;</span><br><span class="line">StopIteration</span><br></pre></td></tr></table></figure>
+<p>重点在receive = yield value这一行，这一行可以分成三部分</p>
+<ol>
+<li>向函数外返回value</li>
+<li>暂停，等待next()或send()时恢复</li>
+<li>外部send()时传入的数据被赋值给receive</li>
+</ol>
+<p>整个的流程就是send(None)或者next()来启动协程，执行到yield的位置，返回value给外部并暂停，外部继续调用send(), 协程取出send()传递的参数并赋值给receive, 继续执行while循环到yield,返回value并暂停。</p>
+<h3 id="闭包"><a href="#闭包" class="headerlink" title="闭包"></a>闭包</h3><p>必须有一个内嵌函数<br>内嵌函数必须引用外部函数中的变量<br>外部函数的返回值必须是内嵌函数</p>
+<h3 id="Python垃圾回收机制"><a href="#Python垃圾回收机制" class="headerlink" title="Python垃圾回收机制"></a>Python垃圾回收机制</h3><p>主要是引用计数，辅以标记清除和分代回收</p>
+<h3 id="python-2-3的区别"><a href="#python-2-3的区别" class="headerlink" title="python 2 3的区别"></a>python 2 3的区别</h3><p>range xrange<br>raw_input input<br>print语句<br>整数除法， 1/4， python2下是0，python3下是0.25<br>unicode python3源码文件默认使用utf-8编码，字符串是unicode字符串<br>返回可迭代对象，而不是列表，如dict.keys(),dict.values(), dict.items()</p>
+<h3 id="函数缓存"><a href="#函数缓存" class="headerlink" title="函数缓存"></a>函数缓存</h3><p>Python3.2+:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> functools <span class="keyword">import</span> lru_cache</span><br><span class="line"></span><br><span class="line"><span class="meta">@lru_cache(maxsize=32)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">fib</span><span class="params">(n)</span>:</span></span><br><span class="line">    <span class="keyword">if</span> n &lt; <span class="number">2</span>:</span><br><span class="line">        <span class="keyword">return</span> n</span><br><span class="line">    <span class="keyword">return</span> fib(n<span class="number">-1</span>) + fib(n<span class="number">-2</span>)</span><br></pre></td></tr></table></figure>
+<p>Python2:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> functools <span class="keyword">import</span> wraps</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">memoize</span><span class="params">(function)</span>:</span></span><br><span class="line">    memo = &#123;&#125;</span><br><span class="line"><span class="meta">    @wraps(function)</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">wrapper</span><span class="params">(*args)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> args <span class="keyword">in</span> memo:</span><br><span class="line">            <span class="keyword">return</span> memo[args]</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            rv = function(*args)</span><br><span class="line">            memo[args] = rv</span><br><span class="line">            <span class="keyword">return</span> rv</span><br><span class="line">    <span class="keyword">return</span> wrapper</span><br><span class="line">    </span><br><span class="line"><span class="meta">@memoize</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">f</span><span class="params">()</span>:</span></span><br><span class="line">	<span class="keyword">pass</span></span><br></pre></td></tr></table></figure>
+<h3 id="上下文管理器"><a href="#上下文管理器" class="headerlink" title="上下文管理器"></a>上下文管理器</h3><p>最广泛使用的是with语句，用于资源的分配和释放，</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">with</span> open(<span class="string">'some_file'</span>, <span class="string">'w'</span>) <span class="keyword">as</span> opened_file:</span><br><span class="line">    opened_file.write(<span class="string">'Hola!'</span>)</span><br></pre></td></tr></table></figure>
+<p>等价于：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">file = open(<span class="string">'some_file'</span>, <span class="string">'w'</span>)</span><br><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    file.write(<span class="string">'Hola!'</span>)</span><br><span class="line"><span class="keyword">finally</span>:</span><br><span class="line">    file.close()</span><br></pre></td></tr></table></figure>
+<p>可以看到with语句会确保文件的关闭，即使发生了异常，避免了常见的异常处理语句。</p>
+<p>常见的场景：文件的打开、数据库会话的建立、资源的加锁和解锁。</p>
+<p>让你定义的对象支持with语句，需要实现<strong>enter</strong>() 和 <strong>exit</strong>() 方法，实现了这两个方法就表明支持了上下文管理协议。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> socket <span class="keyword">import</span> socket, AF_INET, SOCK_STREAM</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">LazyConnection</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, address, family=AF_INET, type=SOCK_STREAM)</span>:</span></span><br><span class="line">        self.address = address</span><br><span class="line">        self.family = family</span><br><span class="line">        self.type = type</span><br><span class="line">        self.sock = <span class="keyword">None</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__enter__</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> self.sock <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>:</span><br><span class="line">            <span class="keyword">raise</span> RuntimeError(<span class="string">'Already connected'</span>)</span><br><span class="line">        self.sock = socket(self.family, self.type)</span><br><span class="line">        self.sock.connect(self.address)</span><br><span class="line">        <span class="keyword">return</span> self.sock</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__exit__</span><span class="params">(self, exc_ty, exc_val, tb)</span>:</span></span><br><span class="line">        self.sock.close()</span><br><span class="line">        self.sock = <span class="keyword">None</span></span><br></pre></td></tr></table></figure>
+<p>这个类是一个网络连接，但初始化的时候并没有建立连接，连接的建立和关闭是使用 with 语句自动完成的。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> functools <span class="keyword">import</span> partial</span><br><span class="line"></span><br><span class="line">conn = LazyConnection((<span class="string">'www.python.org'</span>, <span class="number">80</span>))</span><br><span class="line"><span class="comment"># Connection closed</span></span><br><span class="line"><span class="keyword">with</span> conn <span class="keyword">as</span> s:</span><br><span class="line">    <span class="comment"># conn.__enter__() executes: connection open</span></span><br><span class="line">    s.send(<span class="string">b'GET /index.html HTTP/1.0\r\n'</span>)</span><br><span class="line">    s.send(<span class="string">b'Host: www.python.org\r\n'</span>)</span><br><span class="line">    s.send(<span class="string">b'\r\n'</span>)</span><br><span class="line">    resp = <span class="string">b''</span>.join(iter(partial(s.recv, <span class="number">8192</span>), <span class="string">b''</span>))</span><br><span class="line">    <span class="comment"># conn.__exit__() executes: connection closed</span></span><br></pre></td></tr></table></figure>
+<p>当出现 with 语句的时候，对象的 <strong>enter</strong>() 方法被触发， 它返回的值(如果有的话)会被赋值给 as 声明的变量。然后，with 语句块里面的代码开始执行，进行清理工作。如果with语句内发生异常，也是由<strong>exit</strong>方法来处理，如果执行过程没有出现异常，或者语句体中执行了语句 break/continue/return，则以 None 作为参数调用 <strong>exit</strong>(None, None, None)；如果执行过程中出现异常，则使用 sys.exc_info 得到的异常信息为参数调用 <strong>exit</strong>(exc_type, exc_value, exc_traceback)。</p>
+<p>出现异常时，如果 <strong>exit</strong>(type, value, traceback) 返回 False 或 None，则会重新抛出异常，让 with 之外的语句逻辑来处理异常；如果返回 True，则忽略异常，不再对异常进行处理。</p>
+<p>contextlib 模块提供了三个对象：装饰器 contextmanager、函数 nested 和上下文管理器 closing。ontextmanager 是一个装饰器，用于装饰生成器函数，并返回一个上下文管理器。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> contextlib <span class="keyword">import</span> contextmanager</span><br><span class="line"></span><br><span class="line"><span class="meta">@contextmanager</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">point</span><span class="params">(x, y)</span>:</span></span><br><span class="line">    <span class="keyword">print</span> <span class="string">'before yield'</span></span><br><span class="line">    <span class="keyword">yield</span> x * x + y * y</span><br><span class="line">    <span class="keyword">print</span> <span class="string">'after yield'</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> point(<span class="number">3</span>, <span class="number">4</span>) <span class="keyword">as</span> value:</span><br><span class="line">    <span class="keyword">print</span> <span class="string">'value is: %s'</span> % value</span><br><span class="line"></span><br><span class="line"><span class="comment"># output</span></span><br><span class="line">before <span class="keyword">yield</span></span><br><span class="line">value <span class="keyword">is</span>: <span class="number">25</span></span><br><span class="line">after <span class="keyword">yield</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> contextlib.closing(CreateDatabase()) <span class="keyword">as</span> database:</span><br><span class="line">    database.query()</span><br></pre></td></tr></table></figure>
+<p>虽然通过使用 contextmanager 装饰器，我们可以不必再编写 <strong>enter</strong> 和 <strong>exit</strong> 方法，但是『获取』和『清理』资源的操作仍需要我们自己编写：『获取』资源的操作定义在 yield 语句之前，『释放』资源的操作定义在 yield 语句之后。</p>
+<h3 id="大文件的读写"><a href="#大文件的读写" class="headerlink" title="大文件的读写"></a>大文件的读写</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">read()#所有数据读成一个字符串</span><br><span class="line">readline()#只读取一行(以&apos;\n&apos;结尾)</span><br><span class="line">readlines()#所有行读到一个list</span><br><span class="line">&quot;以上方法:将全部内容读到内存&quot;</span><br></pre></td></tr></table></figure>
+<p>推荐做法：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">with</span> open(<span class="string">'foo.txt'</span>, <span class="string">'r'</span>) <span class="keyword">as</span> f:</span><br><span class="line">    <span class="keyword">for</span> line <span class="keyword">in</span> f:</span><br><span class="line">        <span class="comment"># do_something(line)</span></span><br></pre></td></tr></table></figure>
+<p>通过这种方式,Python将处理文件对象为1个迭代器,并自动使用缓存IO和内存管理,这样我们就不需要关注大的文件了。</p>
+<p>下面的两本小书强烈建议读一下，当然很多内容可能都已经了解了，但总会有新的收获的。</p>
+<p>参考：</p>
+<p><a href="https://eastlakeside.gitbooks.io/interpy-zh/content/" target="_blank" rel="noopener">Intermediate Python中文版</a></p>
+<p><a href="https://python3-cookbook.readthedocs.io/zh_CN/latest/index.html" target="_blank" rel="noopener">Pyhton3 cookbook</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Python/" rel="tag"># Python</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/02/28/Python装饰器/" rel="next" title="Python装饰器总结">
+                <i class="fa fa-chevron-left"></i> Python装饰器总结
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/03/02/go读书笔记总结/" rel="prev" title="Go读书笔记总结">
+                Go读书笔记总结 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">along</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">55</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#args和-kwargs"><span class="nav-number">1.</span> <span class="nav-text">*args和**kwargs</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#生成器"><span class="nav-number">2.</span> <span class="nav-text">生成器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#map-filter-reduce"><span class="nav-number">3.</span> <span class="nav-text">map filter reduce</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#可变与不可变"><span class="nav-number">4.</span> <span class="nav-text">可变与不可变</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#slots-魔法"><span class="nav-number">5.</span> <span class="nav-text">slots 魔法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#协程"><span class="nav-number">6.</span> <span class="nav-text">协程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#闭包"><span class="nav-number">7.</span> <span class="nav-text">闭包</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Python垃圾回收机制"><span class="nav-number">8.</span> <span class="nav-text">Python垃圾回收机制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#python-2-3的区别"><span class="nav-number">9.</span> <span class="nav-text">python 2 3的区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#函数缓存"><span class="nav-number">10.</span> <span class="nav-text">函数缓存</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#上下文管理器"><span class="nav-number">11.</span> <span class="nav-text">上下文管理器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#大文件的读写"><span class="nav-number">12.</span> <span class="nav-text">大文件的读写</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">along</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
