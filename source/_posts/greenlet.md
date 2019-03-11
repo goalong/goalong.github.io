@@ -1,6 +1,6 @@
 ---
 title: greenlet笔记
-date: 2019-03-02
+date: 2019-02-16
 tags: 
 	- Python
 ---
@@ -8,7 +8,8 @@ tags:
 
 ### 简介
 greenlet, 是一种微型线程，也叫协程。基于生成器的协程在进行协程之间的切换时只能由当前的协程切换到其调用者，而greenlet提供的切换允许你切换到指定的协程。
-```
+
+```python
 from greenlet import greenlet
 
 def test1():
@@ -60,7 +61,7 @@ greenlet类型支持继承，继承它的类需要实现自己的run方法。
 ### 切换
 切换在switch调用时发生，执行会被切换到switch方法的调用者，如果一个greenlet死了，执行会切换到其parent greenlet, 调用switch时可以传递一个对象或者异常给调用者，这是一个很方便的在greenlet之间进行传递消息的方式。可以看这个例子：
 
-```
+```python
 def test1(x, y):
     z = gr2.switch(x+y)
     print(z)

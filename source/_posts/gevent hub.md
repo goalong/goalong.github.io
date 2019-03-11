@@ -1,6 +1,6 @@
 ---
-title: [译]gevent的hub
-date: 2019-03-09
+title: gevent的hub
+date: 2019-02-21
 tags: 
 	- gevent
 ---
@@ -78,7 +78,7 @@ Hub(将控制权交还给Hub）。如果当时还没有gevent.hub.Hub实例，�
 
 gevent大多数的阻塞的函数都会在它们的实现里调用Hub.wait().下面是gevent.socket.socket.recv()大致的流程：
 
-```
+```python
 def recv(self, *args):
     while True:
         try:
@@ -93,7 +93,7 @@ def recv(self, *args):
 
 Hub.wait大致的实现是下面这样（这是简化的例子，真实情况要比这安全而且使用了[Waiter](http://www.gevent.org/api/gevent.hub.html#gevent.hub.Waiter):
 
-```
+```python
 def wait(self, watcher): # Hub.wait()
     # `watcher` is an event-loop object with a callback. When the
     # event it's waiting for happens, its callback gets called.

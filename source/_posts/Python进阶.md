@@ -1,6 +1,6 @@
 ---
-title: Python高阶用法备忘
-date: 2019-03-06
+title: Python高级用法
+date: 2019-03-01
 tags: 
 	- Python
 ---
@@ -81,7 +81,7 @@ for item in generator():
 
 注意可迭代对象和迭代器还有一些分别，迭代器是定义了next()或__next__方法的对象，可迭代对象是定义了__iter__或者__getitem__方法的对象。例如字符串是一个可迭代对象，但不是迭代器。
 ### map filter reduce
-```
+```python
 >>>items = [1, 2, 3]
 >>>squared = list(map(lambda x: x**2, items)) //map在python2返回列表，python3返回生成器
 >>>print(squared)
@@ -153,25 +153,27 @@ AttributeError: 'Point' object has no attribute 'z'
 
 协程的本质就是在单线程下，由用户自己控制一个任务遇到io阻塞了就切换另外一个任务去执行，以此来提升效率
 
-	def coro():
-    value = 0
-    while True:
-        receive = yield value
-        if receive == 100:
-            break
-        value = receive
-        
-	>>>a = coro()
-	>>>a.send(None)
-	0
-	>>>a.send(8)
-	8
-	>>>a.send(9)
-	9
-	>>>a.send(100)
-	Traceback (most recent call last):
-	  File "<input>", line 1, in <module>
-	StopIteration
+```python
+def coro():
+	value = 0
+	while True:
+    	receive = yield value
+    	if receive == 100:
+          break
+    	value = receive
+    
+>>>a = coro()
+>>>a.send(None)
+0
+>>>a.send(8)
+8
+>>>a.send(9)
+9
+>>>a.send(100)
+Traceback (most recent call last):
+  File "<input>", line 1, in <module>
+StopIteration
+```
 
 重点在receive = yield value这一行，这一行可以分成三部分
 1. 向函数外返回value
@@ -200,7 +202,7 @@ unicode python3源码文件默认使用utf-8编码，字符串是unicode字符�
 
 Python3.2+:
 
-```
+```python
 from functools import lru_cache
 
 @lru_cache(maxsize=32)
@@ -212,7 +214,7 @@ def fib(n):
 
 Python2:
 
-```
+```python
 from functools import wraps
 
 def memoize(function):
@@ -236,13 +238,13 @@ def f():
 
 最广泛使用的是with语句，用于资源的分配和释放，
 
-```
+```python
 with open('some_file', 'w') as opened_file:
     opened_file.write('Hola!')
 ```
 等价于：
 
-```
+```python
 file = open('some_file', 'w')
 try:
     file.write('Hola!')
@@ -255,7 +257,7 @@ finally:
 
 让你定义的对象支持with语句，需要实现__enter__() 和 __exit__() 方法，实现了这两个方法就表明支持了上下文管理协议。
 
-```
+```python
 from socket import socket, AF_INET, SOCK_STREAM
 
 class LazyConnection:
@@ -278,7 +280,7 @@ class LazyConnection:
 ```
 这个类是一个网络连接，但初始化的时候并没有建立连接，连接的建立和关闭是使用 with 语句自动完成的。
 
-```
+```python
 from functools import partial
 
 conn = LazyConnection(('www.python.org', 80))
@@ -298,7 +300,7 @@ with conn as s:
 
 contextlib 模块提供了三个对象：装饰器 contextmanager、函数 nested 和上下文管理器 closing。ontextmanager 是一个装饰器，用于装饰生成器函数，并返回一个上下文管理器。
 
-```
+```python
 from contextlib import contextmanager
 
 @contextmanager
@@ -330,7 +332,7 @@ readlines()#所有行读到一个list
 ```
 推荐做法：
 
-```
+```python
 with open('foo.txt', 'r') as f:
     for line in f:
         # do_something(line)

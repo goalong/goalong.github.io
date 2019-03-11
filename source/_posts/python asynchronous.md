@@ -1,6 +1,6 @@
 ---
-title: [译文]Python异步之旅
-date: 2019-03-04
+title: Python异步之旅
+date: 2019-02-18
 tags: 
 	- Python
 ---
@@ -27,7 +27,7 @@ tags:
 ### 绿色线程
 绿色线程是比较原始的异步编程方式。绿色线程看起来像普通线程，但是它是应用程序代码进行的调度，而不是操作系统。Gevent是一个著名的使用绿色线程的Python库。Gevent基本上就是绿色线程加eventlet，是一个非阻塞IO的网络库，它通过给普通的Python库打猴子补丁，使其拥有非阻塞IO能力，下面是一个使用Gevent一次对多个URL发送请求的例子。
 
-```
+```python
 import gevent.monkey
 from urllib.request import urlopen
 gevent.monkey.patch_all()
@@ -52,7 +52,7 @@ gevent.wait(jobs)
 
 我们来看一下怎么用tornado做上面的同样的事。
 
-```
+```python
 import tornado.ioloop
 from tornado.httpclient import AsyncHTTPClient
 urls = ['http://www.google.com', 'http://www.yandex.ru', 'http://www.python.org']
@@ -97,7 +97,7 @@ tornado.ioloop.IOLoop.instance().start()
 ### 更好的办法
 在python3.3之前， 这就是所能做到的最好的结果了。要想更进一步改善，需要语言层面的支持，需要Python支持部分执行一个函数，在某个地方暂停执行然后保存下当前栈的所有对象和异常。有人会纳闷这不就是生成器么，协程允许一个函数返回一个列表，但一次只返回一个元素，然后暂停执行直到需要取出下一个元素时。但生成器的问题是一个生成器不能再调用一个生成器，然后让两个生成器都暂停，这个问题直到增加了yield from语法才被解决。生成器能维护栈的信息以及能抛出异常，再加上一个运行生成器的事件循环，就能构造出一个很厉害的异步的库了，asyncio就是这样一个库，你只需要在你的生成器前面加上一个@coroutine装饰器，asyncio库自动为你将这个生成器打补丁成一个协程。下面是一个像上面那样同样访问三个URL的例子：
 
-```
+```python
 import asyncio
 import aiohttp
 
@@ -128,7 +128,7 @@ asyncio.run(asyncio.wait(futures))
 ### async和await
 asyncio受到了很大关注，Python官方甚至把它放到了标准库里。随着着加入了标准库，他们还在Python3.5增加了两个关键字async、await。这俩关键字更加明确的表明你的代码是异步的。async放在def 前边表明这个方法是异步的，await代替yield from更加明确的表明这是在等待一个协程的完成。下面是同样的例子但使用的async/await关键字。
 
-```
+```python
 import asyncio
 import aiohttp
 
