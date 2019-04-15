@@ -1,5 +1,5 @@
 ---
-title: Redis事件循环浅析
+title: Redis事件循环
 date: 2019-04-13
 tags: redis
 ---
@@ -7,7 +7,7 @@ Redis服务器启动之后，会调用initServer进行初始化，并创建一�
 
 ### aeEventLoop结构体
 
-```
+```c
 /* 事件循环结构体 */
 typedef struct aeEventLoop {
     int maxfd;   // 当前注册的最大描述符
@@ -25,7 +25,7 @@ typedef struct aeEventLoop {
 ### 创建处理新连接的文件事件
 之后initServer会创建接收TCP或者UNIX域套接字的文件事件，在可读时调用acceptTcpHandler：
 
-```
+```c
  for (j = 0; j < server.ipfd_count; j++) {
         if (aeCreateFileEvent(server.el, server.ipfd[j], AE_READABLE,
             acceptTcpHandler,NULL) == AE_ERR)
@@ -38,7 +38,7 @@ typedef struct aeEventLoop {
 ### acceptTcpHandler
 acceptTcpHandler就是新的连接到来时的处理函数，下面来看这个函数的代码：
 
-```
+```c
 void acceptTcpHandler(aeEventLoop *el, int fd, void *privdata, int mask) {
     int cport, cfd;
     char cip[REDIS_IP_STR_LEN];
@@ -57,7 +57,7 @@ void acceptTcpHandler(aeEventLoop *el, int fd, void *privdata, int mask) {
 ```
 anetTcpAccept用来接收客户端请求，acceptCommonHandler会调用createClient, createClient非常重要，值得看一下代码：
 
-```
+```c
 client *createClient(int fd) {
     client *c = zmalloc(sizeof(client));
     if (fd != -1) {
