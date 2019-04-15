@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="along&#39;s space">
 <meta property="og:description" content="*args和**kwargs*args 和 **kwargs 主要用于函数定义。 你可以将不定数量的参数传递给一个函数. *args 是用来发送一个非键值对的可变数量的参数列表给一个函数 12345def print_args(f_arg, *argv):    print(&quot;first normal arg:&quot;, f_arg)    for arg in argv:        print(&quot;">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-03-11T06:02:21.000Z">
+<meta property="og:updated_time" content="2019-04-08T15:07:22.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Python高级用法">
 <meta name="twitter:description" content="*args和**kwargs*args 和 **kwargs 主要用于函数定义。 你可以将不定数量的参数传递给一个函数. *args 是用来发送一个非键值对的可变数量的参数列表给一个函数 12345def print_args(f_arg, *argv):    print(&quot;first normal arg:&quot;, f_arg)    for arg in argv:        print(&quot;">
@@ -380,10 +380,15 @@
 <p>推荐做法：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">with</span> open(<span class="string">'foo.txt'</span>, <span class="string">'r'</span>) <span class="keyword">as</span> f:</span><br><span class="line">    <span class="keyword">for</span> line <span class="keyword">in</span> f:</span><br><span class="line">        <span class="comment"># do_something(line)</span></span><br></pre></td></tr></table></figure>
 <p>通过这种方式,Python将处理文件对象为1个迭代器,并自动使用缓存IO和内存管理,这样我们就不需要关注大的文件了。</p>
+<h3 id="赋值"><a href="#赋值" class="headerlink" title="赋值"></a>赋值</h3><p>Python中的=操作符用于给变量赋值，但其实Python中没有赋值，只有引用，例如 x = “hello”, 这个语句其实是创建了一个字符串对象”hello”, 然后给它贴了个标签叫x, 这是引用。</p>
+<h3 id="和-is-区别"><a href="#和-is-区别" class="headerlink" title="== 和 is 区别"></a>== 和 is 区别</h3><p>==比较对象的值，is比较内存中的地址</p>
+<h3 id="init-和-new"><a href="#init-和-new" class="headerlink" title="init 和 new"></a><strong>init</strong> 和 <strong>new</strong></h3><p><strong>init</strong> 只是单纯的对实例进行某些属性的初始化，以及执行一些需要在新建对象时的必要自定义操作，无返回值。而 <strong>new</strong> 返回的是用户创建的实例，这个才是真正用来创建实例的，所以 <strong>new</strong> 是在 <strong>init</strong> 之前执行的，先创建再初始化。</p>
+<h3 id="GIL"><a href="#GIL" class="headerlink" title="GIL"></a>GIL</h3><p>GIL 全称 Global Interpreter Lock（全局解释器锁），任何 Python 线程执行前，必须先获得 GIL 锁，然后，每执行100条字节码，解释器就自动释放GIL锁，让别的线程有机会执行</p>
 <p>下面的两本小书强烈建议读一下，当然很多内容可能都已经了解了，但总会有新的收获的。</p>
 <p>参考：</p>
 <p><a href="https://eastlakeside.gitbooks.io/interpy-zh/content/" target="_blank" rel="noopener">Intermediate Python中文版</a></p>
 <p><a href="https://python3-cookbook.readthedocs.io/zh_CN/latest/index.html" target="_blank" rel="noopener">Pyhton3 cookbook</a></p>
+<p><a href="https://taizilongxu.gitbooks.io/stackoverflow-about-python/" target="_blank" rel="noopener">Stackoverflow 上关于 Python 的问题</a></p>
 
       
     </div>
@@ -503,7 +508,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">55</span>
+                  <span class="site-state-item-count">56</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -516,7 +521,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-count">16</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -549,7 +554,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#args和-kwargs"><span class="nav-number">1.</span> <span class="nav-text">*args和**kwargs</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#生成器"><span class="nav-number">2.</span> <span class="nav-text">生成器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#map-filter-reduce"><span class="nav-number">3.</span> <span class="nav-text">map filter reduce</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#可变与不可变"><span class="nav-number">4.</span> <span class="nav-text">可变与不可变</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#slots-魔法"><span class="nav-number">5.</span> <span class="nav-text">slots 魔法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#协程"><span class="nav-number">6.</span> <span class="nav-text">协程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#闭包"><span class="nav-number">7.</span> <span class="nav-text">闭包</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Python垃圾回收机制"><span class="nav-number">8.</span> <span class="nav-text">Python垃圾回收机制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#python-2-3的区别"><span class="nav-number">9.</span> <span class="nav-text">python 2 3的区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#函数缓存"><span class="nav-number">10.</span> <span class="nav-text">函数缓存</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#上下文管理器"><span class="nav-number">11.</span> <span class="nav-text">上下文管理器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#大文件的读写"><span class="nav-number">12.</span> <span class="nav-text">大文件的读写</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#args和-kwargs"><span class="nav-number">1.</span> <span class="nav-text">*args和**kwargs</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#生成器"><span class="nav-number">2.</span> <span class="nav-text">生成器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#map-filter-reduce"><span class="nav-number">3.</span> <span class="nav-text">map filter reduce</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#可变与不可变"><span class="nav-number">4.</span> <span class="nav-text">可变与不可变</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#slots-魔法"><span class="nav-number">5.</span> <span class="nav-text">slots 魔法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#协程"><span class="nav-number">6.</span> <span class="nav-text">协程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#闭包"><span class="nav-number">7.</span> <span class="nav-text">闭包</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Python垃圾回收机制"><span class="nav-number">8.</span> <span class="nav-text">Python垃圾回收机制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#python-2-3的区别"><span class="nav-number">9.</span> <span class="nav-text">python 2 3的区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#函数缓存"><span class="nav-number">10.</span> <span class="nav-text">函数缓存</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#上下文管理器"><span class="nav-number">11.</span> <span class="nav-text">上下文管理器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#大文件的读写"><span class="nav-number">12.</span> <span class="nav-text">大文件的读写</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#赋值"><span class="nav-number">13.</span> <span class="nav-text">赋值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#和-is-区别"><span class="nav-number">14.</span> <span class="nav-text">== 和 is 区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#init-和-new"><span class="nav-number">15.</span> <span class="nav-text">init 和 new</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GIL"><span class="nav-number">16.</span> <span class="nav-text">GIL</span></a></li></ol></div>
             
 
           </div>

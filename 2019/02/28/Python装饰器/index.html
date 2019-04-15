@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="along&#39;s space">
 <meta property="og:description" content="也写过一些装饰器，但记忆不够深刻，这次系统总结一下以备忘。 功能给一个函数增加额外的功能或操作 实现一个装饰器就是一个函数或类，它接受一个函数作为参数并返回一个新的函数，返回的函数跟被装饰的函数接收相同的参数 @语法糖@d def f ():     pass  上面的下面这样是等价的。     def f ():     pass f = d(f)  在过往的工作和学习中，遇到的使用装饰器的场景">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-03-04T09:10:52.000Z">
+<meta property="og:updated_time" content="2019-03-29T01:27:16.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Python装饰器总结">
 <meta name="twitter:description" content="也写过一些装饰器，但记忆不够深刻，这次系统总结一下以备忘。 功能给一个函数增加额外的功能或操作 实现一个装饰器就是一个函数或类，它接受一个函数作为参数并返回一个新的函数，返回的函数跟被装饰的函数接收相同的参数 @语法糖@d def f ():     pass  上面的下面这样是等价的。     def f ():     pass f = d(f)  在过往的工作和学习中，遇到的使用装饰器的场景">
@@ -347,6 +347,10 @@ f = d(f)
 <p>等价于 f = a(b(c(f)))), 先调用最里层的，然后从里到外。</p>
 <h3 id="类装饰器"><a href="#类装饰器" class="headerlink" title="类装饰器"></a>类装饰器</h3><p>依靠<strong>call</strong>方法实现</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Foo</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, func)</span>:</span></span><br><span class="line">        self._func = func</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__call__</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">print</span> (<span class="string">'class decorator runing'</span>)</span><br><span class="line">        self._func()</span><br><span class="line">        <span class="keyword">print</span> (<span class="string">'class decorator ending'</span>)</span><br><span class="line"></span><br><span class="line"><span class="meta">@Foo</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">bar</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">print</span> (<span class="string">'bar'</span>)</span><br><span class="line"></span><br><span class="line">bar()</span><br></pre></td></tr></table></figure>
+<p>def dec_a(f):<br>    print(“dec a”)<br>    def wrapper_a(<em>args, **kw):<br>        print(“wrap a”)<br>        return f(</em>args, **kw)<br>    return wrapper_a</p>
+<p>def dec_b(f):<br>    print(“dec b”)<br>    def wrapper_b(<em>args, **kw):<br>        print(“wrap b”)<br>        return f(</em>args, **kw)<br>    return wrapper_b</p>
+<h1 id="打印出来的结果"><a href="#打印出来的结果" class="headerlink" title="打印出来的结果"></a>打印出来的结果</h1><p>@dec_b<br>@dec_a<br>def f():<br>    print(“hello”)</p>
+<h1 id="f-dec-b-dec-a-f"><a href="#f-dec-b-dec-a-f" class="headerlink" title="f = dec_b(dec_a(f))"></a>f = dec_b(dec_a(f))</h1><p>if <strong>name</strong> == “<strong>main</strong>“:<br>    f()<br>    f()</p>
 <p>参考：</p>
 <p><a href="https://python3-cookbook.readthedocs.io/zh_CN/latest/chapters/p09_meta_programming.html" target="_blank" rel="noopener">Python Cookbook</a></p>
 <p><a href="https://foofish.net/python-decorator.html" target="_blank" rel="noopener">理解 Python 装饰器看这一篇就够了</a></p>
@@ -469,7 +473,7 @@ f = d(f)
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">55</span>
+                  <span class="site-state-item-count">56</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -482,7 +486,7 @@ f = d(f)
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-count">16</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -515,7 +519,7 @@ f = d(f)
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#功能"><span class="nav-number">1.</span> <span class="nav-text">功能</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实现"><span class="nav-number">2.</span> <span class="nav-text">实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#语法糖"><span class="nav-number">3.</span> <span class="nav-text">@语法糖</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#简单装饰器"><span class="nav-number">4.</span> <span class="nav-text">简单装饰器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#带参数的装饰器"><span class="nav-number">5.</span> <span class="nav-text">带参数的装饰器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#装饰器的副作用"><span class="nav-number">6.</span> <span class="nav-text">装饰器的副作用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#多个装饰器"><span class="nav-number">7.</span> <span class="nav-text">多个装饰器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#类装饰器"><span class="nav-number">8.</span> <span class="nav-text">类装饰器</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#功能"><span class="nav-number">1.</span> <span class="nav-text">功能</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实现"><span class="nav-number">2.</span> <span class="nav-text">实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#语法糖"><span class="nav-number">3.</span> <span class="nav-text">@语法糖</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#简单装饰器"><span class="nav-number">4.</span> <span class="nav-text">简单装饰器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#带参数的装饰器"><span class="nav-number">5.</span> <span class="nav-text">带参数的装饰器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#装饰器的副作用"><span class="nav-number">6.</span> <span class="nav-text">装饰器的副作用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#多个装饰器"><span class="nav-number">7.</span> <span class="nav-text">多个装饰器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#类装饰器"><span class="nav-number">8.</span> <span class="nav-text">类装饰器</span></a></li></ol><li class="nav-item nav-level-1"><a class="nav-link" href="#打印出来的结果"><span class="nav-number"></span> <span class="nav-text">打印出来的结果</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#f-dec-b-dec-a-f"><span class="nav-number"></span> <span class="nav-text">f = dec_b(dec_a(f))</span></a></li></div>
             
 
           </div>
