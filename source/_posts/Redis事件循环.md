@@ -77,9 +77,96 @@ client *createClient(int fd) {
     return c
 }
 ```
-createClient主要做了两件事，一个是为新的连接创建了redisClient结构体来保存这个连接的信息，另一个是创建了一个文件事件，在文件可读的时候调用处理函数readQueryFromClient，readQueryFromClient顾名思义就是读取客户端发来的命令的，这下我们知道了Redis是如何读取客户端的请求的。下面我们先不急着看Redis是如何处理命令以及返回响应的，先继续看Redis的启动。
-### todo, 命令的执行以及返回结果
-### 进入事件循环
+createClient主要做了两件事，一个是为新的连接创建了redisClient结构体来保存这个连接的信息，另一个是创建了一个文件事件，在文件可读的时候调用处理函数readQueryFromClient，readQueryFromClient顾名思义就是读取客户端发来的命令的，这下我们知道了Redis是如何读取客户端的请求的。
+### 命令的执行
+readQueryFromClient读取客户端发来的命令，随后调用processInputBuffer解析命令，processInputBuffer又调用processCommand，processCommand中会根据是单条命令还是多个来选择是直接执行还是放入队列：
+
+```c
+
+if (c->flags & CLIENT_MULTI &&
+    c->cmd->proc != execCommand && c->cmd->proc != discardCommand &&
+    c->cmd->proc != multiCommand && c->cmd->proc != watchCommand)
+{
+    queueMultiCommand(c); // 是多个命令则入队列
+    addReply(c,shared.queued);
+} else {
+    call(c,CMD_CALL_FULL); // 单个命令调用call来执行
+    c->woff = server.master_repl_offset;
+    if (listLength(server.ready_keys))
+        handleClientsBlockedOnLists();
+}
+```
+如果是多个命令则放入队列，是单个命令则调用call来执行，call是核心的执行命令的函数:
+
+```
+oid call(redisClient *c, int flags) {
+    ...
+    // 执行命令
+    c->cmd->proc(c);
+    ...
+}
+```
+c->cmd->proc(c)就是执行命令的代码。Redis初始化的时候创建了一个包含所有命令及其实现的数组，叫做redisCommand:
+
+```
+struct redisCommand redisCommandTable[] = {
+    {"get",getCommand,2,"rF",0,NULL,1,1,1,0,0},
+    {"set",setCommand,-3,"wm",0,NULL,1,1,1,0,0},
+    {"setnx",setnxCommand,3,"wmF",0,NULL,1,1,1,0,0},
+    {"setex",setexCommand,4,"wm",0,NULL,1,1,1,0,0},
+    ...
+}
+```
+redisCommand中包含了命令的字符串表示、具体实现函数以及默认参数等，
+c->cmd->proc(c)就是通过在这个数组中查找到对应命令，然后执行其实现函数。
+
+### 结果的返回
+前面提到每个连接都创建了一个redisClient结构体对象，这个对象中的两个字段buffer和reply用来保存命令的返回值，buffer是一个固定大小的输出缓冲，reply是一个返回对象组成的链表，执行命令获得的结果会尝试放到这两个字端中，然后再返回给客户端。
+
+在每个命令执行完毕之后都会调用到addReply一类的函数，以addReply为例：
+
+```c
+void addReply(client *c, robj *obj) {
+    if (prepareClientToWrite(c) != C_OK) return;
+    if (sdsEncodedObject(obj)) {
+        if (_addReplyToBuffer(c,obj->ptr,sdslen(obj->ptr)) != C_OK)
+            _addReplyObjectToList(c,obj);
+    }
+    ...
+}...
+```
+addReply调用prepareClientToWrite, prepareClientToWrite根据client的flag判断是否将client放到server.clients_pending_write链表中。addReply随后尝试将结果放到输出缓冲中，如果超出缓冲的大小或者reply链表中已经有内容了，就将结果放到reply链表中。
+
+随后在下一轮事件循环开始的时候，会执行eventLoop->beforesleep(eventLoop)这个函数，beforesleep会调用handleClientsWithPendingWrites函数：
+
+```
+int handleClientsWithPendingWrites(void) {
+    ...
+    //获取待输出结果的client数量
+    int processed = listLength(server.clients_pending_write);
+    ...
+    while((ln = listNext(&li))) {
+        ...
+        //输出buf内容
+        if (writeToClient(c->fd,c,0) == C_ERR) continue;
+        ...
+        //注册写事件处理器
+        if (clientHasPendingReplies(c) &&
+            aeCreateFileEvent(server.el, c->fd, AE_WRITABLE,
+                sendReplyToClient, c) == AE_ERR)
+        {
+            freeClientAsync(c);
+        }
+    }
+    return processed;
+}
+```
+
+handleClientsWithPendingWrites遍历server.clients_pending_write，将每个client中保存的结果通过调用writeToClient发送给客户端。
+
+如果writeToClient执行完之后输出缓冲和reply中还有内容，则会注册一个写事件，并关联处理函数sendReplyToClient，在后续的事件循环中会继续调用sendReplyToClient，sendReplyToClient内部调用了writeToClient继续向客户端发送数据。
+
+### 事件循环
 
 initServer执行完之后，main函数会调用aeMain进入一个包含while的事件循环(eventLoop)，这个事件循环可以说是Redis的核心了，循环会一直进行，直到事件循环的stop属性被设置为true时停止。
 
