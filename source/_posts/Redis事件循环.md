@@ -139,7 +139,7 @@ addReply调用prepareClientToWrite, prepareClientToWrite根据client的flag判�
 
 随后在下一轮事件循环开始的时候，会执行eventLoop->beforesleep(eventLoop)这个函数，beforesleep会调用handleClientsWithPendingWrites函数：
 
-```
+```c
 int handleClientsWithPendingWrites(void) {
     ...
     //获取待输出结果的client数量
@@ -163,6 +163,51 @@ int handleClientsWithPendingWrites(void) {
 ```
 
 handleClientsWithPendingWrites遍历server.clients_pending_write，将每个client中保存的结果通过调用writeToClient发送给客户端。
+
+```c
+int writeToClient(int fd, client *c, int handler_installed) {
+    ssize_t nwritten = 0, totwritten = 0;
+    size_t objlen;
+    sds o;
+    //client还有待输出结果
+    while(clientHasPendingReplies(c)) {
+        //先检查buf中是否有内容
+        if (c->bufpos > 0) {
+            nwritten = write(fd,c->buf+c->sentlen,c->bufpos-c->sentlen);
+            if (nwritten <= 0) break;
+            c->sentlen += nwritten;
+            //统计本次一共输出了多少子节
+            totwritten += nwritten;
+            //如果输出子节与buf中数量一直，代表缓冲内容已经全部输出
+            if ((int)c->sentlen == c->bufpos) {
+                c->bufpos = 0;
+                c->sentlen = 0;
+            }
+        //检查c->reply中
+        } else {
+            o = listNodeValue(listFirst(c->reply));
+            objlen = sdslen(o);
+            nwritten = write(fd, o + c->sentlen, objlen - c->sentlen);
+            if (nwritten <= 0) break;
+            c->sentlen += nwritten;
+            totwritten += nwritten;
+            if (c->sentlen == objlen) {
+                listDelNode(c->reply,listFirst(c->reply));
+                c->sentlen = 0;
+                c->reply_bytes -= objlen;
+            }
+        }
+        
+        server.stat_net_output_bytes += totwritten;
+        //如果输出的字节数量已经超过NET_MAX_WRITES_PER_EVENT限制，break
+        if (totwritten > NET_MAX_WRITES_PER_EVENT &&
+            (server.maxmemory == 0 ||
+             zmalloc_used_memory() < server.maxmemory)) break;
+    }
+    ...
+    return C_OK;
+}
+```
 
 如果writeToClient执行完之后输出缓冲和reply中还有内容，则会注册一个写事件，并关联处理函数sendReplyToClient，在后续的事件循环中会继续调用sendReplyToClient，sendReplyToClient内部调用了writeToClient继续向客户端发送数据。
 
