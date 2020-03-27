@@ -97,6 +97,7 @@ menu:
   
   #categories: /categories/ || th
   archives: /archives/ || archive
+  算法: /lc/ || flag
   tags: /tags/ || tags
   about: /about/ || user
   #schedule: /schedule/ || calendar
