@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="os,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="堆和栈简介每个进程有一些可以使用的地址集合，典型值从0到某个最大值，叫做地址空间。这是操作系统为进程提供的一个抽象，是以进程的视角所看到的系统中的内存。 一个进程的地址空间通常包括代码段、数据段、堆、栈，地址从低到高。注意这里的堆和栈不同于数据结构中的堆和栈。 代码段：可执行的代码  数据段： 1.数据段：已初始化的，且初值为非0的全局变量（static变量）         2.bss段：未初始">
+<meta name="keywords" content="os">
+<meta property="og:type" content="article">
+<meta property="og:title" content="进程的堆和栈">
+<meta property="og:url" content="http://goalong.github.io/2019/01/16/进程中的堆和栈/index.html">
+<meta property="og:site_name" content="along&#39;s space">
+<meta property="og:description" content="堆和栈简介每个进程有一些可以使用的地址集合，典型值从0到某个最大值，叫做地址空间。这是操作系统为进程提供的一个抽象，是以进程的视角所看到的系统中的内存。 一个进程的地址空间通常包括代码段、数据段、堆、栈，地址从低到高。注意这里的堆和栈不同于数据结构中的堆和栈。 代码段：可执行的代码  数据段： 1.数据段：已初始化的，且初值为非0的全局变量（static变量）         2.bss段：未初始">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://i.loli.net/2020/03/30/4PdXJnQGNqV6Fb1.jpg">
+<meta property="og:image" content="https://i.loli.net/2020/03/30/sutWBCvwogIXFz6.png">
+<meta property="og:updated_time" content="2020-03-30T12:14:42.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="进程的堆和栈">
+<meta name="twitter:description" content="堆和栈简介每个进程有一些可以使用的地址集合，典型值从0到某个最大值，叫做地址空间。这是操作系统为进程提供的一个抽象，是以进程的视角所看到的系统中的内存。 一个进程的地址空间通常包括代码段、数据段、堆、栈，地址从低到高。注意这里的堆和栈不同于数据结构中的堆和栈。 代码段：可执行的代码  数据段： 1.数据段：已初始化的，且初值为非0的全局变量（static变量）         2.bss段：未初始">
+<meta name="twitter:image" content="https://i.loli.net/2020/03/30/4PdXJnQGNqV6Fb1.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://goalong.github.io/2019/01/16/进程中的堆和栈/">
+
+
+
+
+
+  <title>进程的堆和栈 | along's space</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">along's space</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-算法">
+          <a href="/lc/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-flag"></i> <br>
+            
+            算法
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://goalong.github.io/2019/01/16/进程中的堆和栈/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="along">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="along's space">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">进程的堆和栈</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-16T00:00:00+08:00">
+                2019-01-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="堆和栈简介"><a href="#堆和栈简介" class="headerlink" title="堆和栈简介"></a>堆和栈简介</h3><p>每个进程有一些可以使用的地址集合，典型值从0到某个最大值，叫做地址空间。这是操作系统为进程提供的一个抽象，是以进程的视角所看到的系统中的内存。</p>
+<p>一个进程的地址空间通常包括代码段、数据段、堆、栈，地址从低到高。<br>注意这里的堆和栈不同于数据结构中的堆和栈。</p>
+<pre><code>代码段：可执行的代码
+
+数据段： 1.数据段：已初始化的，且初值为非0的全局变量（static变量）
+        2.bss段：未初始化，或者初值为0的全局变量 （static变量）
+
+堆：可以理解为程序员在程序中自己为变量分配的内存（需手动释放）
+
+栈：保存了函数被调用时所需要的局部变量，函数参数，返回地址。
+    该进程在派生出很多线程时，线程栈也保存在这里。
+
+除了这些之外，夹在stack和heap之间还有一个内存映射段(mmap)
+</code></pre><p>下面是一个C程序的地址空间布局：<br><img src="https://i.loli.net/2020/03/30/4PdXJnQGNqV6Fb1.jpg" alt="memoryLayoutC.jpg"></p>
+<h3 id="实际代码例子"><a href="#实际代码例子" class="headerlink" title="实际代码例子"></a>实际代码例子</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> a = <span class="number">0</span>; <span class="comment">//全局初始化区 </span></span><br><span class="line"><span class="keyword">char</span> *p1; <span class="comment">//全局未初始化区 </span></span><br><span class="line">main() </span><br><span class="line">&#123; </span><br><span class="line">    <span class="keyword">int</span> b; <span class="comment">//栈 </span></span><br><span class="line">    <span class="keyword">char</span> s[] = <span class="string">"abc"</span>; <span class="comment">//栈 </span></span><br><span class="line">    <span class="keyword">char</span> *p2; <span class="comment">//栈 </span></span><br><span class="line">    <span class="keyword">char</span> *p3 = <span class="string">"123456"</span>; <span class="comment">//123456\0在常量区，p3在栈上。 </span></span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">int</span> c =<span class="number">0</span>； <span class="comment">//全局（静态）初始化区 </span></span><br><span class="line">    p1 = (<span class="keyword">char</span> *)<span class="built_in">malloc</span>(<span class="number">10</span>); <span class="comment">//堆 </span></span><br><span class="line">    p2 = (<span class="keyword">char</span> *)<span class="built_in">malloc</span>(<span class="number">20</span>);  <span class="comment">//堆 </span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="栈和堆对比"><a href="#栈和堆对比" class="headerlink" title="栈和堆对比"></a>栈和堆对比</h3><p><img src="https://i.loli.net/2020/03/30/sutWBCvwogIXFz6.png" alt="6E8C5D77-E3F5-4CAD-A991-B7C09A067EAC.png"></p>
+<h3 id="问答总结"><a href="#问答总结" class="headerlink" title="问答总结"></a>问答总结</h3><p>内存分配方面：<br>堆：一般由程序员分配释放， 若程序员不释放，程序结束时可能由OS回收.<br>栈：由编译器(Compiler)自动分配释放，存放函数的参数值，局部变量的值等。</p>
+<p>申请方式方面：<br>堆：需要程序员自己申请，并指明大小。在c中malloc函数如p1 = (char *)malloc(10)；在C++中用new运算符，但是注意p1、p2本身是在栈中的。因为他们还是可以认为是局部变量。</p>
+<p>栈：由系统自动分配。 例如，声明在函数中一个局部变量 int b；系统自动在栈中为b开辟空间。</p>
+<p>系统响应方面：<br>堆：操作系统有一个记录空闲内存地址的链表，当系统收到程序的申请时，会遍历该链表，寻找第一个空间大于所申请空间的堆结点，然后将该结点从空闲结点链表中删除，并将该结点的空间分配给程序。</p>
+<p>栈：只要栈的剩余空间大于所申请空间，系统将为程序提供内存，否则将报异常提示栈溢出。</p>
+<p>大小限制方面：<br>堆：是向高地址扩展的数据结构，是不连续的内存区域。这是由于系统是用链表来存储的空闲内存地址的，自然是不连续的，而链表的遍历方向是由低地址向高地址。堆的大小受限于计算机系统中有效的虚拟内存。由此可见，堆获得的空间比较灵活，也比较大。</p>
+<p>栈：栈的大小是固定的（是一个编译时就确定的常数），如果申请的空间超过栈的剩余空间时，就stack overflow了，linux一般是8M。</p>
+<p>效率方面：<br>堆：是由new分配的内存，一般速度比较慢，而且容易产生内存碎片，不过用起来最方便，</p>
+<p>栈：由系统自动分配，速度较快。但程序员是无法控制的。</p>
+<p>存放内存方面：<br>堆：一般是在堆的头部用一个字节存放堆的大小。堆中的具体内容有程序员安排。</p>
+<p>栈：在函数调用时第一个进栈的是主函数中后的下一条指令（函数调用语句的下一条可执行语句）的地址然后是函数的各个参数，在大多数的C编译器中，参数是由右往左入栈，然后是函数中的局部变量。当本次函数调用结束后，局部变量先出栈，然后是参数，最后栈顶指针指向最开始存的地址，也就是主函数中的下一条指令，程序由该点继续运行。</p>
+<p>存取效率方面：<br>堆：char *s1 = “Hellow Word”；是在编译时就确定的；</p>
+<p>栈：char s1[] = “Hellow Word”； 是在运行时赋值的；用数组比用指针速度要快一些，因为指针在底层汇编中需要用edx寄存器中转一下，而数组在栈上直接读取。</p>
+<p>Refence:</p>
+<p><a href="https://www.geeksforgeeks.org/stack-vs-heap-memory-allocation/" target="_blank" rel="noopener">https://www.geeksforgeeks.org/stack-vs-heap-memory-allocation/</a></p>
+<p><a href="https://www.cnblogs.com/George1994/p/6399895.html" target="_blank" rel="noopener">https://www.cnblogs.com/George1994/p/6399895.html</a></p>
+<p><a href="https://www.youtube.com/watch?v=_8-ht2AKyH4" target="_blank" rel="noopener">https://www.youtube.com/watch?v=_8-ht2AKyH4</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/os/" rel="tag"># os</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/01/07/mysql技术内幕Innodb存储引擎读书笔记/" rel="next" title="Mysql技术内幕Innodb存储引擎读书笔记">
+                <i class="fa fa-chevron-left"></i> Mysql技术内幕Innodb存储引擎读书笔记
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/01/21/Python中的字符编码总结/" rel="prev" title="Python中的字符编码总结">
+                Python中的字符编码总结 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">along</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">59</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#堆和栈简介"><span class="nav-number">1.</span> <span class="nav-text">堆和栈简介</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实际代码例子"><span class="nav-number">2.</span> <span class="nav-text">实际代码例子</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#栈和堆对比"><span class="nav-number">3.</span> <span class="nav-text">栈和堆对比</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#问答总结"><span class="nav-number">4.</span> <span class="nav-text">问答总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">along</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
