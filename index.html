@@ -259,7 +259,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://goalong.github.io/2020/01/12/进程中的堆和栈/">
+    <link itemprop="mainEntityOfPage" href="http://goalong.github.io/2020/01/15/rabbitmq实战指南笔记/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="along">
@@ -278,7 +278,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2020/01/12/进程中的堆和栈/" itemprop="url">进程的堆和栈</a></h1>
+                <a class="post-title-link" href="/2020/01/15/rabbitmq实战指南笔记/" itemprop="url">Rabbitmq实战指南-读书笔记</a></h1>
         
 
         <div class="post-meta">
@@ -290,8 +290,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-01-12T00:00:00+08:00">
-                2020-01-12
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-01-15T00:00:00+08:00">
+                2020-01-15
               </time>
             
 
@@ -330,15 +330,15 @@
       
         
           
-          堆和栈简介每个进程有一些可以使用的地址集合，典型值从0到某个最大值，叫做地址空间。这是操作系统为进程提供的一个抽象，是以进程的视角所看到的系统中的内存。
-一个进程的地址空间通常包括代码段、数据段、堆、栈，地址从低到高。注意这里的堆和栈不同于数据结构中的堆和栈。
-代码段：可执行的代码
-
-数据段： 1.
+          消息中间件的作用异步处理 - 相比于传统的串行、并行方式，提高了系统吞吐量。
+应用解耦 - 系统间通过消息通信，不用关心其他系统的处理。
+流量削锋 - 可以通过消息队列长度控制请求量；可以缓解短时间内的高并发请求。
+日志处理 - 解决大量日志传输。
+消息通讯 - 消息队列一般都内置了高效的通信机制，
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2020/01/12/进程中的堆和栈/#more" rel="contents">
+            <a class="btn" href="/2020/01/15/rabbitmq实战指南笔记/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -468,6 +468,136 @@
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2019/12/31/人生首百/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://goalong.github.io/2019/09/20/进程中的堆和栈/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="along">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="along's space">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/09/20/进程中的堆和栈/" itemprop="url">进程的堆和栈</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-09-20T00:00:00+08:00">
+                2019-09-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+          堆和栈简介每个进程有一些可以使用的地址集合，典型值从0到某个最大值，叫做地址空间。这是操作系统为进程提供的一个抽象，是以进程的视角所看到的系统中的内存。
+一个进程的地址空间通常包括代码段、数据段、堆、栈，地址从低到高。注意这里的堆和栈不同于数据结构中的堆和栈。
+代码段：可执行的代码
+
+数据段： 1.
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2019/09/20/进程中的堆和栈/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1410,138 +1540,11 @@ greenlet是如何进
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://goalong.github.io/2019/02/18/python asynchronous/">
-
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="along">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="along's space">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/02/18/python asynchronous/" itemprop="url">Python异步之旅</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-02-18T00:00:00+08:00">
-                2019-02-18
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-          一般的程序都是一行接着一行的执行的，例如，你要请求远端的服务器上的一份资源，那就意味着在资源返回之前中你的程序什么也没法做，只能在那干等着，等到响应返回才能继续后续的操作。有些情况下，这种等待可以接受，而有些情况下则无法接受。
-线程对这种情景的标准处理办法就是使用线程，一个进程可以创建多个线程，各个
-          ...
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2019/02/18/python asynchronous/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1587,7 +1590,7 @@ greenlet是如何进
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">60</span>
+                  <span class="site-state-item-count">61</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -1600,7 +1603,7 @@ greenlet是如何进
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">18</span>
+                  <span class="site-state-item-count">19</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
