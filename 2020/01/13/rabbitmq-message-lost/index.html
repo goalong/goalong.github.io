@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Rabbitmq,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="在Rabbitmq中，一个消息从生产者发布到消费者消费完成会经历四个部分：  生产者投递消息给exchange  exchange路由消息到队列  消息在队列中存储  消费者订阅队列取出消息并进行消费    这四部分都有丢失的可能, 下面来分别对这四部分可能丢失的情况提出解决方案。 生产者投递消息这个过程应对消息丢失有两个方案：  amqp协议提供了事务机制，Rabbitmq也实现了事务机制 使用">
+<meta name="keywords" content="Rabbitmq">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Rabbitmq消息的可靠性">
+<meta property="og:url" content="http://goalong.github.io/2020/01/13/rabbitmq-message-lost/index.html">
+<meta property="og:site_name" content="along&#39;s space">
+<meta property="og:description" content="在Rabbitmq中，一个消息从生产者发布到消费者消费完成会经历四个部分：  生产者投递消息给exchange  exchange路由消息到队列  消息在队列中存储  消费者订阅队列取出消息并进行消费    这四部分都有丢失的可能, 下面来分别对这四部分可能丢失的情况提出解决方案。 生产者投递消息这个过程应对消息丢失有两个方案：  amqp协议提供了事务机制，Rabbitmq也实现了事务机制 使用">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://i.loli.net/2020/05/07/6SxQ4bhk3JgwHiK.png">
+<meta property="og:updated_time" content="2020-05-07T08:07:22.899Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Rabbitmq消息的可靠性">
+<meta name="twitter:description" content="在Rabbitmq中，一个消息从生产者发布到消费者消费完成会经历四个部分：  生产者投递消息给exchange  exchange路由消息到队列  消息在队列中存储  消费者订阅队列取出消息并进行消费    这四部分都有丢失的可能, 下面来分别对这四部分可能丢失的情况提出解决方案。 生产者投递消息这个过程应对消息丢失有两个方案：  amqp协议提供了事务机制，Rabbitmq也实现了事务机制 使用">
+<meta name="twitter:image" content="https://i.loli.net/2020/05/07/6SxQ4bhk3JgwHiK.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://goalong.github.io/2020/01/13/rabbitmq-message-lost/">
+
+
+
+
+
+  <title>Rabbitmq消息的可靠性 | along's space</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">along's space</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-算法">
+          <a href="/lc/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-flag"></i> <br>
+            
+            算法
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://goalong.github.io/2020/01/13/rabbitmq-message-lost/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="along">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="along's space">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Rabbitmq消息的可靠性</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-01-13T00:00:00+08:00">
+                2020-01-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>在Rabbitmq中，一个消息从生产者发布到消费者消费完成会经历四个部分：</p>
+<ol>
+<li><p>生产者投递消息给exchange</p>
+</li>
+<li><p>exchange路由消息到队列</p>
+</li>
+<li><p>消息在队列中存储</p>
+</li>
+<li><p>消费者订阅队列取出消息并进行消费</p>
+</li>
+</ol>
+<p><img src="https://i.loli.net/2020/05/07/6SxQ4bhk3JgwHiK.png" alt="屏幕快照 2020-03-31 下午7.00.15.png"></p>
+<p>这四部分都有丢失的可能, 下面来分别对这四部分可能丢失的情况提出解决方案。</p>
+<h3 id="生产者投递消息"><a href="#生产者投递消息" class="headerlink" title="生产者投递消息"></a>生产者投递消息</h3><p>这个过程应对消息丢失有两个方案：</p>
+<ol>
+<li>amqp协议提供了事务机制，Rabbitmq也实现了事务机制</li>
+<li>使用生产者确认模式</li>
+</ol>
+<p>事务机制可以看作是一种同步阻塞的方案，生产者发送消息后处于阻塞状态，等待Rabbitmq的回应，由于会极大影响性能，在生产环境中用的不多。</p>
+<p>生产者确认机制是异步的，发送一条消息后不必等待回应就可以继续发送下一条消息，消息最后被成功接收或丢失都会通过回调方法来进行处理。</p>
+<h3 id="exchange路由消息"><a href="#exchange路由消息" class="headerlink" title="exchange路由消息"></a>exchange路由消息</h3><p>消息到达了exchange也可能会由于没有匹配的队列而丢失。</p>
+<p>解决方案也有两种：</p>
+<ol>
+<li>发送消息时mandatory参数设置为true，exchange在无法找到匹配的队列时会将消息返回给生产者</li>
+<li>使用备份交换器</li>
+</ol>
+<p>发送消息时设置mandatory参数为true, 并且没有匹配到队列时，消息会被返回给生产者，但是需要生产者添加监听的业务逻辑来接收。</p>
+<p>如果不想增加生产者进行监听的业务逻辑，可以设置备份交换器，对所有无法路由的消息发送给备份交换器，然后由一个绑定了备份交换器的队列接收消息，后续通过消费这个队列对这些消息进行处理。</p>
+<h3 id="消息存储在队列阶段"><a href="#消息存储在队列阶段" class="headerlink" title="消息存储在队列阶段"></a>消息存储在队列阶段</h3><p>默认情况下消息是存储在内存中的，因此可能会宕机然后消息丢失，所以需要设置持久化。需要注意的是设置持久化需要将消息以及队列都开启持久化。</p>
+<p>持久化的消息也并不是每一条都落盘了，需要一段很短的时间才能存入磁盘，如果是采用了事务机制或者生产者确认机制的话，则确认时是已经落盘的了。</p>
+<p>不过这里还存在一个单点的问题，如果单机故障并且磁盘损毁也会消息丢失，因此一般为了高可用会设置镜像队列，镜像队列是一个数据副本，在主节点挂掉后可以自动切换到从节点。</p>
+<h3 id="消息的消费阶段"><a href="#消息的消费阶段" class="headerlink" title="消息的消费阶段"></a>消息的消费阶段</h3><p>消息在被消费者接收后，还没来得及处理就宕机了，也算是丢失的情况。类似生产者确认机制，Rabbitmq提供了消费者确认机制。</p>
+<p>消费者在订阅队列时，可以设置只有显式回复确认时，消息才会被Rabbitmq移除。</p>
+<p>消息消费失败时也可以进行拒绝而不是确认，拒绝时可以指定requeue参数，设置为true的情况下消息会被重新存入队列，以便发送给下一个订阅的消费者。</p>
+<p>requeue的消息会被放入队列头部，如果再次消费时又是拒绝然后requeue, 可能会出现无限循环的情况，推荐放到一个死信队列，然后对死信队列的消息进行消费和分析。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Rabbitmq/" rel="tag"># Rabbitmq</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/01/06/rabbitmq总结/" rel="next" title="Rabbitmq总结">
+                <i class="fa fa-chevron-left"></i> Rabbitmq总结
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">along</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">63</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">19</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#生产者投递消息"><span class="nav-number">1.</span> <span class="nav-text">生产者投递消息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#exchange路由消息"><span class="nav-number">2.</span> <span class="nav-text">exchange路由消息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#消息存储在队列阶段"><span class="nav-number">3.</span> <span class="nav-text">消息存储在队列阶段</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#消息的消费阶段"><span class="nav-number">4.</span> <span class="nav-text">消息的消费阶段</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">along</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
