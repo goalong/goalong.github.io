@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content=",,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="开篇词好书就是有漫卷诗书喜欲狂的感觉。 根据我的个人体验，好书就是能把事情说清楚的书，而且说的还很简单，直击要点、一剑封喉。甚至于有一种美感在，为啥呢，核心就是简单，哈哈，谁不喜欢简单呢。 以下是我学习过程中比较推崇的书，还有一些是待看的书，主要是后端开发者要了解的领域：操作系统、Linux、网络、数据结构和算法、数据库(Mysql)、缓存(Redis)、消息队列、系统设计与架构。  当然，这远远">
+<meta name="keywords" content="书单">
+<meta property="og:type" content="website">
+<meta property="og:title" content="后端书单">
+<meta property="og:url" content="http://goalong.github.io/books/index.html">
+<meta property="og:site_name" content="along&#39;s space">
+<meta property="og:description" content="开篇词好书就是有漫卷诗书喜欲狂的感觉。 根据我的个人体验，好书就是能把事情说清楚的书，而且说的还很简单，直击要点、一剑封喉。甚至于有一种美感在，为啥呢，核心就是简单，哈哈，谁不喜欢简单呢。 以下是我学习过程中比较推崇的书，还有一些是待看的书，主要是后端开发者要了解的领域：操作系统、Linux、网络、数据结构和算法、数据库(Mysql)、缓存(Redis)、消息队列、系统设计与架构。  当然，这远远">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-05-12T11:11:58.313Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="后端书单">
+<meta name="twitter:description" content="开篇词好书就是有漫卷诗书喜欲狂的感觉。 根据我的个人体验，好书就是能把事情说清楚的书，而且说的还很简单，直击要点、一剑封喉。甚至于有一种美感在，为啥呢，核心就是简单，哈哈，谁不喜欢简单呢。 以下是我学习过程中比较推崇的书，还有一些是待看的书，主要是后端开发者要了解的领域：操作系统、Linux、网络、数据结构和算法、数据库(Mysql)、缓存(Redis)、消息队列、系统设计与架构。  当然，这远远">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://goalong.github.io/books/">
+
+
+
+
+
+  <title>后端书单 | along's space</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">along's space</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-算法">
+          <a href="/lc/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-flag"></i> <br>
+            
+            算法
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-书单">
+          <a href="/books/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-calendar"></i> <br>
+            
+            书单
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    
+    
+    <div class="post-block page">
+      <header class="post-header">
+
+	<h1 class="post-title" itemprop="name headline">后端书单</h1>
+
+
+
+</header>
+
+      
+      
+      
+      <div class="post-body">
+        
+        
+          <h2 id="开篇词"><a href="#开篇词" class="headerlink" title="开篇词"></a>开篇词</h2><p>好书就是有漫卷诗书喜欲狂的感觉。</p>
+<p>根据我的个人体验，好书就是能把事情说清楚的书，而且说的还很简单，直击要点、一剑封喉。甚至于有一种美感在，为啥呢，核心就是简单，哈哈，谁不喜欢简单呢。</p>
+<p>以下是我学习过程中比较推崇的书，还有一些是待看的书，主要是后端开发者要了解的领域：操作系统、Linux、网络、数据结构和算法、数据库(Mysql)、缓存(Redis)、消息队列、系统设计与架构。</p>
+<!-- 作为一个非科班的程序员，我也是下了一点点功夫的。 -->
+<p>当然，这远远不够，不光要看书，还要思考：为什么这么设计，还有什么其他的方式，各种做法优缺点是什么，适合什么样的场景。最好还是能实践，在实践中发现和解决问题。</p>
+<p>学会在学习中进行思辨，才是真正的把书读进去了，要不然就只是别人思想的跑马场。</p>
+<p>借用生物学上的生产者、消费者和分解者的概念，写书的、创造开源项目的这种创造性的活动，人家是生产者，我们读书的是消费者，写博客对知识进行阐述加上一些自己的见解的，算是分解者。</p>
+<p>也希望自己在不停不停的输入之后，能够有所积累，也做一个生产者。</p>
+<p>哦，扯远了，就是列个书单的，不过，要有梦想嘛。做成一件事，靠的不止是最初的热情，还有之后的纪律，与你共勉。</p>
+<h2 id="操作系统"><a href="#操作系统" class="headerlink" title="操作系统"></a>操作系统</h2><h4 id="深入理解计算机系统"><a href="#深入理解计算机系统" class="headerlink" title="深入理解计算机系统"></a>深入理解计算机系统</h4><p>点评：看了重点章节，程序员必看，神书，强推</p>
+<h4 id="OSTEP（操作系统导论"><a href="#OSTEP（操作系统导论" class="headerlink" title="OSTEP（操作系统导论)"></a>OSTEP（操作系统导论)</h4><p>点评：看了感兴趣的章节，待继续看完，阅读体验超级顺滑，神书，强推</p>
+<h4 id="现代操作系统"><a href="#现代操作系统" class="headerlink" title="现代操作系统"></a>现代操作系统</h4><p>点评：看了重点章节，比较正统的书</p>
+<h4 id="操作系统精髓与设计原理"><a href="#操作系统精髓与设计原理" class="headerlink" title="操作系统精髓与设计原理"></a>操作系统精髓与设计原理</h4><p>点评：看了部分章节，如果有概念在一本书介绍的没太懂，可以多本书对照着来读</p>
+<h4 id="APUE-Unix环境高级编程"><a href="#APUE-Unix环境高级编程" class="headerlink" title="APUE(Unix环境高级编程)"></a>APUE(Unix环境高级编程)</h4><p>点评：待看，各类API的详细介绍，系统编程的大词典，适合快速浏览然后按需查看</p>
+<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><p>深入理解计算机系统和OSTEP必看，APUE必看，现代操作系统和操作系统精髓与设计原理二者看一个。</p>
+<h2 id="网络"><a href="#网络" class="headerlink" title="网络"></a>网络</h2><h4 id="图解TCP-IP"><a href="#图解TCP-IP" class="headerlink" title="图解TCP/IP"></a>图解TCP/IP</h4><p>点评：看过，比较适合初学，快速入门，基础不错可以不看</p>
+<h4 id="TCP-IP详解"><a href="#TCP-IP详解" class="headerlink" title="TCP/IP详解"></a>TCP/IP详解</h4><p>点评：看过，强推，进阶看这个，里面详细介绍了Linux和Windows系统下的网络编程API，可以跳过Windows的了，所以看起来也很快</p>
+<h4 id="UNIX网络编程卷1：套接字联网API"><a href="#UNIX网络编程卷1：套接字联网API" class="headerlink" title="UNIX网络编程卷1：套接字联网API"></a>UNIX网络编程卷1：套接字联网API</h4><p>点评：没看完，挑选重点章节来看，总结的Unix五种IO模型要了解</p>
+<h4 id="总结-1"><a href="#总结-1" class="headerlink" title="总结"></a>总结</h4><p>TCP/IP详解这本书不错，必看，UNIX网络编程作为加深理解，选择重点章节来看。</p>
+<h2 id="Mysql"><a href="#Mysql" class="headerlink" title="Mysql"></a>Mysql</h2><h4 id="高性能mysql"><a href="#高性能mysql" class="headerlink" title="高性能mysql"></a>高性能mysql</h4><p>点评：看过，必看，经典</p>
+<h4 id="数据库索引设计与优化"><a href="#数据库索引设计与优化" class="headerlink" title="数据库索引设计与优化"></a>数据库索引设计与优化</h4><p>点评：索引相关的进阶，不过可替代，太多博客和文章写过这一块了</p>
+<h4 id="MySQL技术内幕InnoDB存储引擎"><a href="#MySQL技术内幕InnoDB存储引擎" class="headerlink" title="MySQL技术内幕InnoDB存储引擎"></a>MySQL技术内幕InnoDB存储引擎</h4><p>点评：看过，强推，看完这本书对于innodb存储引擎的细节就把握的比较好了</p>
+<h4 id="总结-2"><a href="#总结-2" class="headerlink" title="总结"></a>总结</h4><p>高性能mysql和MySQL技术内幕InnoDB存储引擎都看了吧，都是好书。</p>
+<h2 id="Redis"><a href="#Redis" class="headerlink" title="Redis"></a>Redis</h2><h4 id="Redis设计与实现"><a href="#Redis设计与实现" class="headerlink" title="Redis设计与实现"></a>Redis设计与实现</h4><p>点评：看了感兴趣的章节，强推</p>
+<h4 id="Redis运维与开发"><a href="#Redis运维与开发" class="headerlink" title="Redis运维与开发"></a>Redis运维与开发</h4><p>点评：看了重点章节，作为补充</p>
+<h4 id="总结-3"><a href="#总结-3" class="headerlink" title="总结"></a>总结</h4><p>就两本，都看了吧，当然，有选择的看一些章节</p>
+<h2 id="消息队列"><a href="#消息队列" class="headerlink" title="消息队列"></a>消息队列</h2><h4 id="RabbitMQ实战指南"><a href="#RabbitMQ实战指南" class="headerlink" title="RabbitMQ实战指南"></a>RabbitMQ实战指南</h4><p>点评：看过，学习Rabbitmq的话不能错过</p>
+<h4 id="Kafka权威指南"><a href="#Kafka权威指南" class="headerlink" title="Kafka权威指南"></a>Kafka权威指南</h4><p>点评：还没看</p>
+<h4 id="深入理解Kafka：核心设计与实践原理"><a href="#深入理解Kafka：核心设计与实践原理" class="headerlink" title="深入理解Kafka：核心设计与实践原理"></a>深入理解Kafka：核心设计与实践原理</h4><p>点评：还没看</p>
+<h2 id="Linux"><a href="#Linux" class="headerlink" title="Linux"></a>Linux</h2><h4 id="Linux高性能服务器编程"><a href="#Linux高性能服务器编程" class="headerlink" title="Linux高性能服务器编程"></a>Linux高性能服务器编程</h4><p>点评：看过重点章节，还不错</p>
+<h4 id="Linux内核设计与实现"><a href="#Linux内核设计与实现" class="headerlink" title="Linux内核设计与实现"></a>Linux内核设计与实现</h4><p>点评：在看，阅读体验很好，强推</p>
+<h4 id="深入理解linux内核"><a href="#深入理解linux内核" class="headerlink" title="深入理解linux内核"></a>深入理解linux内核</h4><p>点评：待看</p>
+<h2 id="算法"><a href="#算法" class="headerlink" title="算法"></a>算法</h2><h4 id="剑指offer"><a href="#剑指offer" class="headerlink" title="剑指offer"></a>剑指offer</h4><p>点评：必看，没啥可说的，许多高频的算法题</p>
+<h4 id="数据结构与算法之美（极客时间专栏"><a href="#数据结构与算法之美（极客时间专栏" class="headerlink" title="数据结构与算法之美（极客时间专栏)"></a>数据结构与算法之美（极客时间专栏)</h4><p>点评：专栏写的不错，对于系统学习数据结构和算法算是一个不错的资源</p>
+<h4 id="Leetcode"><a href="#Leetcode" class="headerlink" title="Leetcode"></a>Leetcode</h4><p>点评：做了前300道中免费的吧，算法还是靠练习，强推</p>
+<h4 id="总结-4"><a href="#总结-4" class="headerlink" title="总结"></a>总结</h4><p>理论知识可以靠数据结构与算法之美，实践的话，时间仓促就剑指offer过一遍，有时间就leetcode</p>
+<h2 id="系统设计"><a href="#系统设计" class="headerlink" title="系统设计"></a>系统设计</h2><h4 id="从零开始学架构"><a href="#从零开始学架构" class="headerlink" title="从零开始学架构"></a>从零开始学架构</h4><p>点评：快速看了一遍，不错，推荐</p>
+<h4 id="数据密集型应用系统设计"><a href="#数据密集型应用系统设计" class="headerlink" title="数据密集型应用系统设计"></a>数据密集型应用系统设计</h4><p>点评：在看，正好都是我感兴趣的话题，强推</p>
+<h4 id="总结-5"><a href="#总结-5" class="headerlink" title="总结"></a>总结</h4><p>都看, 都特别好</p>
+<h2 id="分布式系统"><a href="#分布式系统" class="headerlink" title="分布式系统"></a>分布式系统</h2><h4 id="mit-6-824"><a href="#mit-6-824" class="headerlink" title="mit 6.824"></a>mit 6.824</h4><p>点评：待跟，大概是最好的学习分布式系统的课程了，今年重点学习的内容</p>
+
+        
+      </div>
+      
+      
+      
+    </div>
+    
+    
+    
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">along</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">63</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">18</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#开篇词"><span class="nav-number">1.</span> <span class="nav-text">开篇词</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#操作系统"><span class="nav-number">2.</span> <span class="nav-text">操作系统</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#深入理解计算机系统"><span class="nav-number">2.0.1.</span> <span class="nav-text">深入理解计算机系统</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#OSTEP（操作系统导论"><span class="nav-number">2.0.2.</span> <span class="nav-text">OSTEP（操作系统导论)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#现代操作系统"><span class="nav-number">2.0.3.</span> <span class="nav-text">现代操作系统</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#操作系统精髓与设计原理"><span class="nav-number">2.0.4.</span> <span class="nav-text">操作系统精髓与设计原理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#APUE-Unix环境高级编程"><span class="nav-number">2.0.5.</span> <span class="nav-text">APUE(Unix环境高级编程)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#总结"><span class="nav-number">2.0.6.</span> <span class="nav-text">总结</span></a></li></ol></li></ol><li class="nav-item nav-level-2"><a class="nav-link" href="#网络"><span class="nav-number">3.</span> <span class="nav-text">网络</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#图解TCP-IP"><span class="nav-number">3.0.1.</span> <span class="nav-text">图解TCP/IP</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#TCP-IP详解"><span class="nav-number">3.0.2.</span> <span class="nav-text">TCP/IP详解</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#UNIX网络编程卷1：套接字联网API"><span class="nav-number">3.0.3.</span> <span class="nav-text">UNIX网络编程卷1：套接字联网API</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#总结-1"><span class="nav-number">3.0.4.</span> <span class="nav-text">总结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Mysql"><span class="nav-number">4.</span> <span class="nav-text">Mysql</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#高性能mysql"><span class="nav-number">4.0.1.</span> <span class="nav-text">高性能mysql</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#数据库索引设计与优化"><span class="nav-number">4.0.2.</span> <span class="nav-text">数据库索引设计与优化</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#MySQL技术内幕InnoDB存储引擎"><span class="nav-number">4.0.3.</span> <span class="nav-text">MySQL技术内幕InnoDB存储引擎</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#总结-2"><span class="nav-number">4.0.4.</span> <span class="nav-text">总结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis"><span class="nav-number">5.</span> <span class="nav-text">Redis</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Redis设计与实现"><span class="nav-number">5.0.1.</span> <span class="nav-text">Redis设计与实现</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Redis运维与开发"><span class="nav-number">5.0.2.</span> <span class="nav-text">Redis运维与开发</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#总结-3"><span class="nav-number">5.0.3.</span> <span class="nav-text">总结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#消息队列"><span class="nav-number">6.</span> <span class="nav-text">消息队列</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#RabbitMQ实战指南"><span class="nav-number">6.0.1.</span> <span class="nav-text">RabbitMQ实战指南</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Kafka权威指南"><span class="nav-number">6.0.2.</span> <span class="nav-text">Kafka权威指南</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#深入理解Kafka：核心设计与实践原理"><span class="nav-number">6.0.3.</span> <span class="nav-text">深入理解Kafka：核心设计与实践原理</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux"><span class="nav-number">7.</span> <span class="nav-text">Linux</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Linux高性能服务器编程"><span class="nav-number">7.0.1.</span> <span class="nav-text">Linux高性能服务器编程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Linux内核设计与实现"><span class="nav-number">7.0.2.</span> <span class="nav-text">Linux内核设计与实现</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#深入理解linux内核"><span class="nav-number">7.0.3.</span> <span class="nav-text">深入理解linux内核</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#算法"><span class="nav-number">8.</span> <span class="nav-text">算法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#剑指offer"><span class="nav-number">8.0.1.</span> <span class="nav-text">剑指offer</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#数据结构与算法之美（极客时间专栏"><span class="nav-number">8.0.2.</span> <span class="nav-text">数据结构与算法之美（极客时间专栏)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Leetcode"><span class="nav-number">8.0.3.</span> <span class="nav-text">Leetcode</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#总结-4"><span class="nav-number">8.0.4.</span> <span class="nav-text">总结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#系统设计"><span class="nav-number">9.</span> <span class="nav-text">系统设计</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#从零开始学架构"><span class="nav-number">9.0.1.</span> <span class="nav-text">从零开始学架构</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#数据密集型应用系统设计"><span class="nav-number">9.0.2.</span> <span class="nav-text">数据密集型应用系统设计</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#总结-5"><span class="nav-number">9.0.3.</span> <span class="nav-text">总结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分布式系统"><span class="nav-number">10.</span> <span class="nav-text">分布式系统</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#mit-6-824"><span class="nav-number">10.0.1.</span> <span class="nav-text">mit 6.824</span></a></li></ol></li></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">along</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
